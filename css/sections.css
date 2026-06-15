@@ -81,9 +81,9 @@
   align-items: center;
 }
 
-/* Right side — YAML terminal */
 .hero-right {
   width: 100%;
+  align-self: center;
 }
 
 @media (max-width: 960px) {
@@ -101,7 +101,7 @@
 
 /* ===== MARQUEE STRIP ===== */
 #marquee {
-  padding: var(--s6) 0;
+  padding: var(--s5) 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);

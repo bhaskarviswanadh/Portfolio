@@ -295,14 +295,16 @@
 /* ---- Tech Marquee ---- */
 .marquee-wrapper {
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 .marquee-track {
   display: flex;
-  gap: var(--s8);
+  align-items: center;
+  gap: var(--s10);
   width: max-content;
-  animation: marquee 30s linear infinite;
+  animation: marquee 40s linear infinite;
+  will-change: transform;
 }
 .marquee-track:hover { animation-play-state: paused; }
 .marquee-item {
@@ -313,13 +315,22 @@
   font-size: 0.8125rem;
   color: var(--text-3);
   white-space: nowrap;
-  transition: color 0.2s;
+  transition: color 0.25s ease;
+  flex-shrink: 0;
 }
 .marquee-item:hover { color: var(--text-2); }
-.marquee-item-icon { font-size: 1rem; }
+.marquee-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+  flex-shrink: 0;
+}
+.marquee-item:hover .marquee-logo { opacity: 0.85; }
 
 @keyframes marquee {
-  0% { transform: translateX(0); }
+  0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
@@ -328,10 +339,10 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: var(--s5) var(--s6);
+  padding: var(--s4) var(--s5);
   font-family: var(--mono);
   font-size: 0.8125rem;
-  line-height: 1.9;
+  line-height: 1.65;
   white-space: pre;
   overflow-x: auto;
   position: relative;
@@ -340,7 +351,7 @@
   display: flex;
   align-items: center;
   gap: var(--s2);
-  margin-bottom: var(--s4);
+  margin-bottom: var(--s3);
   padding-bottom: var(--s3);
   border-bottom: 1px solid var(--border);
 }
@@ -359,6 +370,7 @@
 .yaml-string { color: var(--accent); }
 .yaml-array  { color: #93c5fd; }
 .yaml-comment{ color: var(--text-3); font-style: italic; }
+.yaml-colon  { color: var(--text-3); }
 
 /* ---- Availability pill ---- */
 .avail-pill {
