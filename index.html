@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bhaskar Viswanadh Devisetti — Cloud &amp; DevOps Engineer</title>
+  <meta name="description" content="Cloud & DevOps engineer with hands-on AWS, Docker, Kubernetes, and CI/CD expertise. Network Operations background. Open to opportunities." />
+  <meta name="keywords" content="DevOps, Cloud Engineer, AWS, Kubernetes, Docker, GitHub Actions, Linux, Network Operations" />
+  <meta name="author" content="Bhaskar Viswanadh Devisetti" />
+  <meta name="theme-color" content="#0d0e11" />
+  <link rel="canonical" href="https://viswanadh.dev/" />
+
+  <!-- OG -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Bhaskar Viswanadh — Cloud & DevOps Engineer" />
+  <meta property="og:description" content="Cloud & DevOps engineer — AWS, Kubernetes, Docker, GitHub Actions, Go, Python." />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230d0e11'/><text y='23' x='7' font-size='17' font-family='monospace' fill='%2310b981'>❯</text></svg>" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/design-system.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+</head>
+<body>
+
+<!-- ============================================================
+  NAV
+  ============================================================ -->
+<nav id="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+
+    <a href="#hero" class="nav-brand">
+      <span class="nav-brand-prompt">❯</span>
+      viswanadh.dev
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#experience"  class="nav-link" data-section="experience"  >experience</a></li>
+      <li><a href="#projects"    class="nav-link" data-section="projects"    >projects</a></li>
+      <li><a href="#skills"      class="nav-link" data-section="skills"      >skills</a></li>
+      <li><a href="#education"   class="nav-link" data-section="education"   >education</a></li>
+      <li><a href="#contact"     class="nav-link" data-section="contact"     >contact</a></li>
+    </ul>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="assets/Bhaskar viswanadh Devisetti.pdf" download class="nav-resume" id="nav-resume-btn">resume</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<main>
+
+<!-- ============================================================
+  HERO
+  ============================================================ -->
+<section id="hero" aria-labelledby="hero-name">
+
+  <div class="hero-layout">
+
+    <!-- Left -->
+    <div class="hero-left">
+
+      <div>
+        <div class="avail-pill" style="margin-bottom: 20px;">
+          <span class="dot dot-green"></span>
+          Available for Cloud &amp; DevOps roles
+        </div>
+        <div class="hero-cmd reveal">
+          <span class="hero-cmd-prompt">❯</span>
+          <span style="font-family:var(--mono);font-size:0.9375rem;color:var(--text-2);">kubectl auth whoami</span>
+        </div>
+      </div>
+
+      <h1 class="hero-name reveal reveal-delay-1" id="hero-name">
+        Bhaskar<br />Viswanadh
+      </h1>
+
+      <p class="hero-title reveal reveal-delay-2">
+        Cloud &amp; DevOps Engineer · Network Operations
+      </p>
+
+      <p class="hero-desc reveal reveal-delay-3">
+        I build and automate infrastructure. Hands-on with AWS, Docker, Kubernetes,
+        and CI/CD pipelines. Background in network operations and a 9.3 CGPA
+        engineering degree to prove I can figure things out.
+      </p>
+
+      <div class="hero-stats reveal reveal-delay-3">
+        <div>
+          <div class="hero-stat-val">2+</div>
+          <div class="hero-stat-lbl">projects shipped</div>
+        </div>
+        <div>
+          <div class="hero-stat-val">9.3</div>
+          <div class="hero-stat-lbl">CGPA</div>
+        </div>
+        <div>
+          <div class="hero-stat-val">1 yr</div>
+          <div class="hero-stat-lbl">ops internship</div>
+        </div>
+      </div>
+
+      <div class="hero-cta reveal reveal-delay-4">
+        <a href="assets/Bhaskar viswanadh Devisetti.pdf" download class="btn btn-accent" id="hero-resume-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10V3M5 8l3 3 3-3"/><path d="M2 13h12"/></svg>
+          aws s3 cp resume.pdf
+        </a>
+        <a href="#contact" class="btn btn-ghost" id="hero-contact-btn">
+          kubectl get contact
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Right — YAML terminal -->
+    <div class="hero-right reveal reveal-delay-2">
+      <div class="yaml-block">
+        <div class="yaml-block-titlebar">
+          <div class="yaml-dot yaml-dot-r"></div>
+          <div class="yaml-dot yaml-dot-y"></div>
+          <div class="yaml-dot yaml-dot-g"></div>
+          <span class="yaml-titlebar-text">~/viswanadh</span>
+        </div>
+        <div id="yaml-content">
+<span class="yaml-comment">&gt; kubectl get me -o yaml</span>
+<span class="yaml-key">apiVersion</span><span style="color:var(--text-3);">: </span><span class="yaml-value">career/v1</span>
+<span class="yaml-key">kind</span><span style="color:var(--text-3);">: </span><span class="yaml-value">Engineer</span>
+<span class="yaml-key">metadata</span><span style="color:var(--text-3);">:</span>
+  <span class="yaml-key">name</span><span style="color:var(--text-3);">: </span><span class="yaml-string">bhaskar-viswanadh</span>
+  <span class="yaml-key">labels</span><span style="color:var(--text-3);">:</span>
+    <span class="yaml-key">role</span><span style="color:var(--text-3);">: </span><span class="yaml-string">cloud-devops</span>
+    <span class="yaml-key">focus</span><span style="color:var(--text-3);">: </span><span class="yaml-string">infrastructure</span>
+<span class="yaml-key">spec</span><span style="color:var(--text-3);">:</span>
+  <span class="yaml-key">location</span><span style="color:var(--text-3);">: </span><span class="yaml-string">Vizianagaram, India</span>
+  <span class="yaml-key">education</span><span style="color:var(--text-3);">: </span><span class="yaml-string">B.Tech CSE (Networks) · CGPA 9.3</span>
+  <span class="yaml-key">stack</span><span style="color:var(--text-3);">: </span><span class="yaml-array">[aws, docker, kubernetes, go, python]</span>
+  <span class="yaml-key">ci_cd</span><span style="color:var(--text-3);">: </span><span class="yaml-array">[github-actions, docker-compose]</span>
+  <span class="yaml-key">contact</span><span style="color:var(--text-3);">: </span><span class="yaml-string">viswanathdevisetti789@gmail.com</span>
+<span class="yaml-key">status</span><span style="color:var(--text-3);">:</span>
+  <span class="yaml-key">phase</span><span style="color:var(--text-3);">: </span><span class="yaml-string">Available</span><span id="yaml-cursor" style="display:inline-block;width:7px;height:14px;background:var(--accent);vertical-align:text-bottom;margin-left:2px;border-radius:1px;"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+  TECH MARQUEE STRIP
+  ============================================================ -->
+<div id="marquee" aria-hidden="true">
+  <div class="marquee-wrapper">
+    <div class="marquee-track" id="marquee-track">
+      <div class="marquee-item"><span class="marquee-item-icon">☁️</span> AWS</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🐳</span> Docker</div>
+      <div class="marquee-item"><span class="marquee-item-icon">⚙️</span> Kubernetes</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🐍</span> Python</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🔵</span> Go</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🔁</span> GitHub Actions</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🐧</span> Linux</div>
+      <div class="marquee-item"><span class="marquee-item-icon">💻</span> Bash</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🌐</span> TCP/IP · DNS</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🔀</span> Git</div>
+      <div class="marquee-item"><span class="marquee-item-icon">📦</span> S3 · EC2 · IAM</div>
+      <div class="marquee-item"><span class="marquee-item-icon">🖧</span> Minikube</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+  EXPERIENCE
+  ============================================================ -->
+<section id="experience" aria-labelledby="exp-heading">
+  <div class="container">
+
+    <div class="section-cmd reveal">
+      <span class="section-cmd-prompt">❯</span>
+      <span class="section-cmd-text">kubectl get experience</span>
+    </div>
+    <p class="section-cmd-sub reveal">network operations &amp; cloud infrastructure work</p>
+
+    <div class="exp-stack" id="exp-heading">
+
+      <div class="exp-card reveal">
+        <div class="exp-card-top">
+          <div>
+            <div class="exp-company">Centurion University of Technology and Management</div>
+            <div class="exp-location">Vizianagaram, Andhra Pradesh, India</div>
+            <div class="exp-role" style="margin-top:10px;">Network Operations Intern</div>
+          </div>
+          <div>
+            <div class="exp-date">Feb 2025 — Feb 2026</div>
+            <div class="exp-status"><span class="dot dot-green"></span>Running</div>
+          </div>
+        </div>
+
+        <ul class="exp-bullets">
+          <li class="exp-bullet">Maintained campus network infrastructure including switches, routers, and access points supporting daily operations across departments.</li>
+          <li class="exp-bullet">Monitored network performance and troubleshot LAN/WAN connectivity issues across multiple departments, reducing downtime.</li>
+          <li class="exp-bullet">Configured VLANs, subnetting, routing, and firewall access policies following security best practices.</li>
+          <li class="exp-bullet">Assisted in server monitoring, backup operations, and infrastructure documentation within data center environments.</li>
+          <li class="exp-bullet">Performed Linux administration tasks — process management, user/group management, system monitoring — and resolved networking issues for end users.</li>
+        </ul>
+
+        <div class="exp-tags">
+          <span class="tag">Linux</span>
+          <span class="tag">VLANs</span>
+          <span class="tag">TCP/IP</span>
+          <span class="tag">Routing</span>
+          <span class="tag">Firewall</span>
+          <span class="tag">Bash</span>
+          <span class="tag">Wireshark</span>
+          <span class="tag">Cisco Packet Tracer</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  PROJECTS
+  ============================================================ -->
+<section id="projects" aria-labelledby="proj-heading">
+  <div class="container">
+
+    <div class="section-cmd reveal">
+      <span class="section-cmd-prompt">❯</span>
+      <span class="section-cmd-text">terraform plan ./projects</span>
+    </div>
+    <p class="section-cmd-sub reveal" id="proj-heading">infrastructure &amp; platform tooling</p>
+
+    <div class="proj-grid">
+
+      <!-- Project 1 -->
+      <div class="proj-card reveal">
+        <div>
+          <div class="proj-card-title-row">
+            <span class="proj-plus">+</span>
+            <span class="proj-name">idp-deploy-cli</span>
+          </div>
+          <div class="proj-context">@ personal project · Go</div>
+        </div>
+        <p class="proj-desc">
+          CLI-based Internal Developer Platform built in Go to automate end-to-end application deployment.
+          Configuration-driven YAML generates Kubernetes manifests dynamically, eliminating static files.
+          Integrated with Minikube for orchestration — one command (<code style="font-family:var(--mono);color:var(--accent);font-size:0.8rem;">idp deploy</code>) handles build, containerize, and expose.
+        </p>
+        <div class="proj-tags">
+          <span class="tag">Go</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Kubernetes</span>
+          <span class="tag">Minikube</span>
+          <span class="tag">YAML</span>
+        </div>
+        <a href="https://github.com/viswanadh" target="_blank" rel="noopener" class="proj-link" id="proj1-github">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12L12 4M12 4H7M12 4V9"/></svg>
+        </a>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="proj-card reveal reveal-delay-1">
+        <div>
+          <div class="proj-card-title-row">
+            <span class="proj-plus">+</span>
+            <span class="proj-name">network-monitor-platform</span>
+          </div>
+          <div class="proj-context">@ network ops · Flask · AWS EC2</div>
+        </div>
+        <p class="proj-desc">
+          Flask-based monitoring platform collecting CPU, memory, uptime, and interface metrics from
+          network devices. Automates polling of 18+ switches using Paramiko and APScheduler.
+          Containerized with Docker Compose, CI/CD via GitHub Actions, deployed to AWS EC2.
+        </p>
+        <div class="proj-tags">
+          <span class="tag">Python</span>
+          <span class="tag">Flask</span>
+          <span class="tag">Docker</span>
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">AWS EC2</span>
+          <span class="tag">Paramiko</span>
+        </div>
+        <a href="https://github.com/viswanadh" target="_blank" rel="noopener" class="proj-link" id="proj2-github">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12L12 4M12 4H7M12 4V9"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SKILLS
+  ============================================================ -->
+<section id="skills" aria-labelledby="skills-heading">
+  <div class="container">
+
+    <div class="section-cmd reveal">
+      <span class="section-cmd-prompt">❯</span>
+      <span class="section-cmd-text">gcloud components list --installed</span>
+    </div>
+    <p class="section-cmd-sub reveal" id="skills-heading">technical stack and tooling</p>
+
+    <div class="skills-grid">
+
+      <div class="reveal">
+        <div class="skill-group-label">Cloud &amp; DevOps</div>
+        <div class="skill-tags">
+          <span class="tag">AWS EC2</span>
+          <span class="tag">AWS S3</span>
+          <span class="tag">AWS IAM</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Docker Compose</span>
+          <span class="tag">Kubernetes</span>
+          <span class="tag">Minikube</span>
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">CI/CD</span>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <div class="skill-group-label">Languages &amp; Scripting</div>
+        <div class="skill-tags">
+          <span class="tag">Go</span>
+          <span class="tag">Python</span>
+          <span class="tag">Bash</span>
+          <span class="tag">YAML</span>
+          <span class="tag">Linux Admin</span>
+          <span class="tag">Shell Scripting</span>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="skill-group-label">Networking</div>
+        <div class="skill-tags">
+          <span class="tag">TCP/IP</span>
+          <span class="tag">DNS</span>
+          <span class="tag">DHCP</span>
+          <span class="tag">HTTP/HTTPS</span>
+          <span class="tag">VLANs</span>
+          <span class="tag">Subnetting</span>
+          <span class="tag">Routing</span>
+          <span class="tag">Firewall</span>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-3">
+        <div class="skill-group-label">Tools</div>
+        <div class="skill-tags">
+          <span class="tag">Git</span>
+          <span class="tag">GitHub</span>
+          <span class="tag">Wireshark</span>
+          <span class="tag">Nmap</span>
+          <span class="tag">Cisco Packet Tracer</span>
+          <span class="tag">Paramiko</span>
+          <span class="tag">APScheduler</span>
+          <span class="tag">Flask</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  EDUCATION
+  ============================================================ -->
+<section id="education" aria-labelledby="edu-heading">
+  <div class="container">
+
+    <div class="section-cmd reveal">
+      <span class="section-cmd-prompt">❯</span>
+      <span class="section-cmd-text">kubectl get education -o wide</span>
+    </div>
+    <p class="section-cmd-sub reveal" id="edu-heading">academic background</p>
+
+    <div class="edu-card reveal">
+      <div>
+        <div class="edu-univ">Centurion University of Technology and Management</div>
+        <div class="edu-degree">Bachelor of Technology in Computer Science and Engineering</div>
+        <div class="edu-degree" style="color:var(--text-3);font-size:0.8125rem;margin-top:4px;font-family:var(--mono);">Specialization: Computer Networks · Vizianagaram, Andhra Pradesh</div>
+        <div class="edu-meta" style="margin-top: 20px;">
+          <div class="edu-meta-item">
+            <div class="edu-meta-label">Status</div>
+            <div class="edu-meta-value" style="display:flex;align-items:center;gap:6px;"><span class="dot dot-green"></span>Pursuing</div>
+          </div>
+          <div class="edu-meta-item">
+            <div class="edu-meta-label">Degree</div>
+            <div class="edu-meta-value">B.Tech CSE</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="edu-cgpa">9.3</div>
+        <div class="edu-cgpa-label">CGPA</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+  CONTACT
+  ============================================================ -->
+<section id="contact" aria-labelledby="contact-heading">
+  <div class="container">
+
+    <div class="section-cmd reveal">
+      <span class="section-cmd-prompt">❯</span>
+      <span class="section-cmd-text">kubectl get contact -o json</span>
+    </div>
+    <p class="section-cmd-sub reveal" id="contact-heading">let's build something together</p>
+
+    <p class="contact-intro reveal">
+      I'm actively looking for Cloud Engineering and DevOps roles — full-time, contract, or internship.
+      Whether it's about a job, a project, or just talking infrastructure, reach out.
+    </p>
+
+    <div class="contact-grid">
+
+      <a href="mailto:viswanathdevisetti789@gmail.com" class="contact-link reveal" id="contact-email">
+        <div class="contact-link-icon">📧</div>
+        <div>
+          <div class="contact-link-label">Email</div>
+          <div class="contact-link-value">viswanathdevisetti789@gmail.com</div>
+        </div>
+        <span class="contact-link-arrow">↗</span>
+      </a>
+
+      <a href="tel:+917993041307" class="contact-link reveal reveal-delay-1" id="contact-phone">
+        <div class="contact-link-icon">📱</div>
+        <div>
+          <div class="contact-link-label">Phone</div>
+          <div class="contact-link-value">+91-7993041307</div>
+        </div>
+        <span class="contact-link-arrow">↗</span>
+      </a>
+
+      <a href="https://linkedin.com/in/bhaskar-viswanadh-devisetti" target="_blank" rel="noopener" class="contact-link reveal reveal-delay-2" id="contact-linkedin">
+        <div class="contact-link-icon">💼</div>
+        <div>
+          <div class="contact-link-label">LinkedIn</div>
+          <div class="contact-link-value">linkedin.com/in/bhaskar-viswanadh</div>
+        </div>
+        <span class="contact-link-arrow">↗</span>
+      </a>
+
+      <a href="https://github.com/viswanadh" target="_blank" rel="noopener" class="contact-link reveal reveal-delay-3" id="contact-github">
+        <div class="contact-link-icon">🐙</div>
+        <div>
+          <div class="contact-link-label">GitHub</div>
+          <div class="contact-link-value">github.com/viswanadh</div>
+        </div>
+        <span class="contact-link-arrow">↗</span>
+      </a>
+
+    </div>
+
+    <div style="margin-top: var(--s8); display:flex; justify-content:center;">
+      <a href="assets/Bhaskar viswanadh Devisetti.pdf" download class="btn btn-accent" id="contact-resume-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10V3M5 8l3 3 3-3"/><path d="M2 13h12"/></svg>
+        Download Resume (PDF)
+      </a>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+  FOOTER
+  ============================================================ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span class="footer-copy">© <span id="footer-year">2026</span> Bhaskar Viswanadh Devisetti</span>
+      <div class="footer-links">
+        <a href="https://github.com/viswanadh" target="_blank" rel="noopener" class="footer-link">github</a>
+        <a href="https://linkedin.com/in/bhaskar-viswanadh-devisetti" target="_blank" rel="noopener" class="footer-link">linkedin</a>
+        <a href="mailto:viswanathdevisetti789@gmail.com" class="footer-link">email</a>
+      </div>
+      <span class="footer-copy" style="color:var(--text-4);">built with ❯ and ☁️</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
