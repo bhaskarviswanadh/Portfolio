@@ -1,0 +1,133 @@
+export type Experience = {
+  id: string;
+  company: string;
+  role: string;
+  duration: string;
+  period: string;
+  location: string;
+  status: "Running" | "Completed";
+  tech: string[];
+  bullets: string[];
+};
+
+export type Project = {
+  name: string;
+  context: string;
+  description: string;
+  tech: string[];
+  link?: string;
+};
+
+export type SkillGroup = {
+  label: string;
+  items: string[];
+};
+
+export const profile = {
+  name: "Bhaskar Viswanadh Devisetti",
+  role: "Cloud & DevOps Engineer",
+  location: "Vizianagaram, India",
+  availability: "Open to Cloud & DevOps opportunities",
+  summary:
+    "Passionate Cloud & DevOps engineer with hands-on experience in containerization, Kubernetes orchestration, CI/CD automation, and network infrastructure. I build platforms that are reliable, automated, and developer-friendly — from a single `idp deploy` command to full network monitoring stacks on AWS.",
+  stats: [
+    { value: "9.3", label: "CGPA" },
+    { value: "2", label: "projects shipped" },
+    { value: "1yr", label: "internship exp." },
+  ],
+  email: "viswanathdevisetti789@gmail.com",
+  linkedin: "in/bhaskarviswanadhdevisetti",
+  linkedinUrl: "https://www.linkedin.com/in/bhaskarviswanadhdevisetti/",
+  github: "bhaskarviswanadh",
+  githubUrl: "https://github.com/bhaskarviswanadh",
+  resume: "/Bhaskar viswanadh Devisetti.pdf",
+};
+
+export const experience: Experience[] = [
+  {
+    id: "centurion-intern",
+    company: "Centurion University of Technology and Management",
+    role: "Network Operations Intern",
+    duration: "Feb 2025 – Feb 2026",
+    period: "Feb 2025 – Feb 2026",
+    location: "Vizianagaram, India",
+    status: "Running",
+    tech: ["Linux", "Networking", "VLANs", "Routing", "Firewalls", "Bash"],
+    bullets: [
+      "Maintained campus network infrastructure including switches, routers, and access points supporting daily operations.",
+      "Monitored network performance and troubleshot LAN/WAN connectivity issues across multiple departments.",
+      "Configured VLANs, subnetting, routing, and firewall access policies following security best practices.",
+      "Assisted in server monitoring, backup operations, and infrastructure documentation within data center environments.",
+      "Performed Linux administration tasks and resolved networking and system-related issues for end users.",
+    ],
+  },
+];
+
+export const projects: Project[] = [
+  {
+    name: "idp-project",
+    context: "Personal Project",
+    description:
+      "A CLI-based Internal Developer Platform (IDP) built in Go that automates end-to-end application deployment. Uses YAML config to dynamically generate Kubernetes manifests, Docker for containerization, and Minikube for orchestration — reducing multi-step deploys to a single `idp deploy` command.",
+    tech: ["Go", "Docker", "Kubernetes", "Minikube", "YAML", "GitHub Actions"],
+    link: "https://github.com/bhaskarviswanadh/idp-project",
+  },
+  {
+    name: "Network-Monitoring-System",
+    context: "Personal Project",
+    description:
+      "A Flask-based containerized monitoring platform that polls 18+ network switches using Paramiko and APScheduler to collect CPU, memory, uptime, and interface metrics. Deployed on AWS EC2 with Docker Compose and a full CI/CD pipeline via GitHub Actions.",
+    tech: ["Python", "Flask", "Docker", "Docker Compose", "AWS EC2", "GitHub Actions", "Paramiko"],
+    link: "https://github.com/bhaskarviswanadh/Network-Monitoring-System",
+  },
+];
+
+export const skills: SkillGroup[] = [
+  {
+    label: "cloud & devops",
+    items: [
+      "AWS (EC2, S3, IAM)",
+      "Docker & Docker Compose",
+      "Kubernetes & Minikube",
+      "GitHub Actions & CI/CD",
+      "Containerization",
+    ],
+  },
+  {
+    label: "linux & scripting",
+    items: [
+      "Linux Administration",
+      "Bash Scripting",
+      "Python",
+      "User & Group Management",
+      "Process Management",
+    ],
+  },
+  {
+    label: "networking",
+    items: [
+      "TCP/IP, DNS, DHCP",
+      "HTTP/HTTPS",
+      "VLANs & Subnetting",
+      "Routing & Switching",
+      "Network Troubleshooting",
+    ],
+  },
+  {
+    label: "tools & technologies",
+    items: [
+      "Git & GitHub",
+      "Go",
+      "Wireshark & Nmap",
+      "Cisco Packet Tracer",
+      "Flask & REST APIs",
+    ],
+  },
+];
+
+export const navItems = [
+  { id: "experience", label: "experience" },
+  { id: "projects", label: "projects" },
+  { id: "skills", label: "skills" },
+  { id: "contact", label: "contact" },
+];
