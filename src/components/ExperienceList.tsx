@@ -12,8 +12,8 @@ export default function ExperienceList() {
       <div className="space-y-4">
         {/* column header, kubectl-style */}
         <div className="hidden grid-cols-12 gap-4 px-4 font-mono text-xs uppercase tracking-wider text-muted md:grid">
-          <span className="col-span-3">name</span>
-          <span className="col-span-5">role</span>
+          <span className="col-span-5">name</span>
+          <span className="col-span-3">role</span>
           <span className="col-span-2">duration</span>
           <span className="col-span-2">status</span>
         </div>
@@ -24,10 +24,10 @@ export default function ExperienceList() {
             className="group rounded-lg border border-iron bg-obsidian/60 p-5 transition-colors hover:border-accent/40"
           >
             <div className="grid gap-2 md:grid-cols-12 md:gap-4">
-              <div className="col-span-3 font-mono text-base font-semibold text-bright">
+              <div className="col-span-5 font-mono text-base font-semibold text-bright">
                 {job.company}
               </div>
-              <div className="col-span-5 font-mono text-sm text-accent">
+              <div className="col-span-3 font-mono text-sm text-accent">
                 {job.role}
               </div>
               <div className="col-span-2 font-mono text-xs text-muted">
