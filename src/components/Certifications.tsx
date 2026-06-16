@@ -13,9 +13,8 @@ export default function Certifications() {
         {certifications.map((c, i) => (
           <div
             key={c.short}
-            className={`flex items-center gap-4 px-5 py-4 ${
-              i !== 0 ? "border-t border-iron" : ""
-            }`}
+            className={`flex items-center gap-4 px-5 py-4 ${i !== 0 ? "border-t border-iron" : ""
+              }`}
           >
             <span className="font-mono text-accent">✓</span>
             <span className="w-20 shrink-0 font-mono text-sm font-semibold text-bright">

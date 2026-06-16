@@ -23,6 +23,12 @@ export type SkillGroup = {
   items: string[];
 };
 
+export type Cert = {
+  short: string;
+  name: string;
+  issuer: string;
+};
+
 export const profile = {
   name: "Bhaskar Viswanadh Devisetti",
   role: "Cloud & DevOps Engineer",
@@ -125,9 +131,31 @@ export const skills: SkillGroup[] = [
   },
 ];
 
+export const certifications: Cert[] = [
+  {
+    short: "CKA",
+    name: "Certified Kubernetes Administrator (In Progress)",
+    issuer: "CNCF",
+  },
+  {
+    short: "AWS SAA",
+    name: "AWS Certified Solutions Architect - Associate (Target)",
+    issuer: "Amazon Web Services",
+  },
+];
+
+export const awards = [
+  {
+    title: "B.Tech Academic Honors",
+    org: "Centurion University of Technology and Management (9.3 CGPA)",
+    year: "2025",
+  },
+];
+
 export const navItems = [
   { id: "experience", label: "experience" },
   { id: "projects", label: "projects" },
   { id: "skills", label: "skills" },
+  // { id: "certifications", label: "certs" },
   { id: "contact", label: "contact" },
 ];

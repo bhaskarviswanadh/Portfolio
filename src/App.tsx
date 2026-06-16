@@ -5,7 +5,7 @@ import Hero from "@/components/Hero";
 import ExperienceList from "@/components/ExperienceList";
 import ProjectGrid from "@/components/ProjectGrid";
 import SkillsList from "@/components/SkillsList";
-
+import Certifications from "@/components/Certifications";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import CommandPalette from "@/components/CommandPalette";
@@ -20,6 +20,7 @@ function App() {
           <ExperienceList />
           <ProjectGrid />
           <SkillsList />
+          {/* <Certifications /> */}
           <Contact />
         </main>
         <Footer />
