@@ -17,9 +17,9 @@ import { projects } from "@/data";
 
 /* ─── palette per project ─────────────────────────────────────── */
 const PALETTES: Record<string, { a: string; b: string; bg: string }> = {
-  "idp-project":                   { a: "#00d2ff", b: "#3a7bd5", bg: "#020e18" },
-  "Network-Monitoring-System":     { a: "#f7971e", b: "#ff512f", bg: "#100800" },
-  "AI-Lead-Qualification-Bot":     { a: "#da22ff", b: "#9733ee", bg: "#0d0118" },
+  "idp-project": { a: "#00d2ff", b: "#3a7bd5", bg: "#020e18" },
+  "Network-Monitoring-System": { a: "#f7971e", b: "#ff512f", bg: "#100800" },
+  "AI-Lead-Qualification-Bot": { a: "#da22ff", b: "#ab63e9ff", bg: "#0d0118" },
   "AI-Customer-Support-Assistant": { a: "#11998e", b: "#38ef7d", bg: "#00100d" },
 };
 const pal = (name: string) => PALETTES[name] ?? { a: "#2dd4bf", b: "#0ea5e9", bg: "#0d0e11" };
@@ -155,13 +155,13 @@ function CardVisual({ project, isActive }: { project: typeof projects[0]; isActi
 type Pos = "left2" | "left1" | "center" | "right1" | "right2" | "gone";
 
 function getPos(idx: number, active: number, total: number): Pos {
-  const rel  = ((idx - active) % total + total) % total;
+  const rel = ((idx - active) % total + total) % total;
   const rrel = ((active - idx) % total + total) % total;
-  if (rel  === 0) return "center";
+  if (rel === 0) return "center";
   if (rrel === 1) return "left1";
-  if (rel  === 1) return "right1";
+  if (rel === 1) return "right1";
   if (rrel === 2 && total > 3) return "left2";
-  if (rel  === 2 && total > 3) return "right2";
+  if (rel === 2 && total > 3) return "right2";
   return "gone";
 }
 
@@ -169,12 +169,12 @@ interface LayoutProps { translateX: string; scale: number; opacity: number; rota
 
 function layout(pos: Pos): LayoutProps {
   switch (pos) {
-    case "center": return { translateX:  "0px",   scale: 1,    opacity: 1,    rotateY:  0,  z: 40, filter: "brightness(1)"    };
-    case "left1":  return { translateX: "-248px",  scale: 0.84, opacity: 0.72, rotateY: 24,  z: 20, filter: "brightness(0.55)" };
-    case "right1": return { translateX:  "248px",  scale: 0.84, opacity: 0.72, rotateY: -24, z: 20, filter: "brightness(0.55)" };
-    case "left2":  return { translateX: "-410px",  scale: 0.66, opacity: 0.28, rotateY: 42,  z: 10, filter: "brightness(0.3)"  };
-    case "right2": return { translateX:  "410px",  scale: 0.66, opacity: 0.28, rotateY: -42, z: 10, filter: "brightness(0.3)"  };
-    default:       return { translateX:  "0px",   scale: 0.5,  opacity: 0,    rotateY:  0,  z:  0, filter: "brightness(0)"    };
+    case "center": return { translateX: "0px", scale: 1, opacity: 1, rotateY: 0, z: 40, filter: "brightness(1)" };
+    case "left1": return { translateX: "-248px", scale: 0.84, opacity: 0.72, rotateY: 24, z: 20, filter: "brightness(0.55)" };
+    case "right1": return { translateX: "248px", scale: 0.84, opacity: 0.72, rotateY: -24, z: 20, filter: "brightness(0.55)" };
+    case "left2": return { translateX: "-410px", scale: 0.66, opacity: 0.28, rotateY: 42, z: 10, filter: "brightness(0.3)" };
+    case "right2": return { translateX: "410px", scale: 0.66, opacity: 0.28, rotateY: -42, z: 10, filter: "brightness(0.3)" };
+    default: return { translateX: "0px", scale: 0.5, opacity: 0, rotateY: 0, z: 0, filter: "brightness(0)" };
   }
 }
 
@@ -196,8 +196,8 @@ function ProjectCard({ project, pos, onClick }: {
   const onMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
     if (!isActive || !cardRef.current) return;
     const r = cardRef.current.getBoundingClientRect();
-    rawX.set(((e.clientX - r.left) / r.width  - 0.5) * 2);
-    rawY.set(((e.clientY - r.top)  / r.height - 0.5) * 2);
+    rawX.set(((e.clientX - r.left) / r.width - 0.5) * 2);
+    rawY.set(((e.clientY - r.top) / r.height - 0.5) * 2);
   }, [isActive, rawX, rawY]);
 
   const onLeave = useCallback(() => { rawX.set(0); rawY.set(0); }, [rawX, rawY]);
@@ -217,10 +217,10 @@ function ProjectCard({ project, pos, onClick }: {
       }}
       animate={{
         translateX: lyt.translateX,
-        scale:      lyt.scale,
-        opacity:    lyt.opacity,
-        rotateY:    lyt.rotateY,
-        filter:     lyt.filter,
+        scale: lyt.scale,
+        opacity: lyt.opacity,
+        rotateY: lyt.rotateY,
+        filter: lyt.filter,
       }}
       initial={false}
       transition={{ type: "spring", stiffness: 300, damping: 34, mass: 0.85 }}
@@ -350,7 +350,7 @@ export default function ProjectCarousel() {
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft")  prev();
+      if (e.key === "ArrowLeft") prev();
       if (e.key === "ArrowRight") next();
     };
     window.addEventListener("keydown", h);
@@ -359,7 +359,7 @@ export default function ProjectCarousel() {
 
   const ts = useRef<number | null>(null);
   const onTouchStart = (e: React.TouchEvent) => { ts.current = e.touches[0].clientX; };
-  const onTouchEnd   = (e: React.TouchEvent) => {
+  const onTouchEnd = (e: React.TouchEvent) => {
     if (ts.current === null) return;
     const d = e.changedTouches[0].clientX - ts.current;
     if (Math.abs(d) > 40) d < 0 ? next() : prev();
