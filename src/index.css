@@ -152,3 +152,18 @@ body::before {
   );
   background-size: 22px 22px;
 }
+
+/* Floating idle animation for project cards */
+@keyframes float-idle {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+.float-idle {
+  animation: float-idle 5s ease-in-out infinite;
+}
+
+/* Carousel perspective wrapper */
+.carousel-stage {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}

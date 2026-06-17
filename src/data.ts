@@ -14,6 +14,7 @@ export type Project = {
   name: string;
   context: string;
   description: string;
+  summary?: string;
   tech: string[];
   link?: string;
 };
@@ -38,7 +39,7 @@ export const profile = {
     "Passionate Cloud & DevOps engineer with hands-on experience in containerization, Kubernetes orchestration, CI/CD automation, and network infrastructure. I build platforms that are reliable, automated, and developer-friendly — from a single `idp deploy` command to full network monitoring stacks on AWS.",
   stats: [
     { value: "9.3", label: "CGPA" },
-    { value: "2", label: "projects shipped" },
+    { value: "4", label: "projects shipped" },
     { value: "1yr", label: "internship exp." },
   ],
   email: "viswanathdevisetti789@gmail.com",
@@ -75,6 +76,7 @@ export const projects: Project[] = [
     context: "Personal Project",
     description:
       "A CLI-based Internal Developer Platform (IDP) built in Go that automates end-to-end application deployment. Uses YAML config to dynamically generate Kubernetes manifests, Docker for containerization, and Minikube for orchestration — reducing multi-step deploys to a single `idp deploy` command.",
+    summary: "CLI-driven Internal Developer Platform in Go that automates Kubernetes deployments end-to-end with a single command.",
     tech: ["Go", "Docker", "Kubernetes", "Minikube", "YAML", "GitHub Actions"],
     link: "https://github.com/bhaskarviswanadh/idp-project",
   },
@@ -83,8 +85,29 @@ export const projects: Project[] = [
     context: "Personal Project",
     description:
       "A Flask-based containerized monitoring platform that polls 18+ network switches using Paramiko and APScheduler to collect CPU, memory, uptime, and interface metrics. Deployed on AWS EC2 with Docker Compose and a full CI/CD pipeline via GitHub Actions.",
+    summary: "Containerized network monitoring platform polling 18+ switches for real-time metrics, deployed on AWS EC2 with full CI/CD.",
     tech: ["Python", "Flask", "Docker", "Docker Compose", "AWS EC2", "GitHub Actions", "Paramiko"],
     link: "https://github.com/bhaskarviswanadh/Network-Monitoring-System",
+  },
+  {
+    name: "AI-Lead-Qualification-Bot",
+    context: "Personal Project",
+    description:
+      "Built an AI-powered lead qualification system that automatically analyzes incoming leads, evaluates their intent and business requirements, and categorizes them based on qualification criteria. The workflow reduces manual screening effort by extracting key information, scoring prospects, and routing high-potential leads for faster follow-up, helping sales teams focus on conversion-ready opportunities.",
+    summary:
+      "AI-driven lead qualification workflow that analyzes, scores, and categorizes incoming prospects to automate sales pipeline management.",
+    tech: ["n8n", "OpenAI", "Gemini API", "Webhooks", "JSON Processing", "Google Sheets", "REST APIs", "Prompt Engineering", "Workflow Automation"],
+    link: "https://github.com/bhaskarviswanadh/AI-Lead-Qualification-Bot",
+  },
+  {
+    name: "AI-Customer-Support-Assistant",
+    context: "Personal Project",
+    description:
+      "Developed an AI-powered customer support assistant capable of understanding user queries, retrieving relevant information, and generating contextual responses in real time. The system automates repetitive support interactions, improves response consistency, and delivers 24/7 assistance through conversational AI workflows.",
+    summary:
+      "AI-powered support assistant that automates customer interactions and provides intelligent, context-aware responses.",
+    tech: ["n8n", "OpenAI", "Gemini API", "AI Agents", "Prompt Engineering", "Webhooks", "API Integrations", "Knowledge Base Retrieval", "Workflow Automation"],
+    link: "https://github.com/bhaskarviswanadh/AI-Customer-Support-Assistant",
   },
 ];
 

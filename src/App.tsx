@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import ExperienceList from "@/components/ExperienceList";
-import ProjectGrid from "@/components/ProjectGrid";
+import ProjectCarousel from "@/components/ProjectCarousel";
 import SkillsList from "@/components/SkillsList";
 // import Certifications from "@/components/Certifications";
 import Contact from "@/components/Contact";
@@ -18,7 +18,7 @@ function App() {
         <main>
           <Hero />
           <ExperienceList />
-          <ProjectGrid />
+          <ProjectCarousel />
           <SkillsList />
           {/* <Certifications /> */}
           <Contact />
