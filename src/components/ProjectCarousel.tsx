@@ -81,6 +81,7 @@ function CardVisual({ project, isActive }: { project: typeof projects[0]; isActi
             key={i}
             d={`M-40,${60 + off} C80,${30 + off} 180,${90 + off} 320,${50 + off} S480,${70 + off} 400,${60 + off}`}
             fill="none" stroke={i % 2 === 0 ? a : b} strokeWidth="1.5"
+            initial={{ opacity: 0.3, pathLength: 0.4 }}
             animate={isActive
               ? { pathLength: [0.3, 1, 0.3], opacity: [0.4, 0.9, 0.4] }
               : { pathLength: 0.4, opacity: 0.3 }}
@@ -242,7 +243,7 @@ function ProjectCard({ project, pos, onClick }: {
         {isActive && (
           <motion.div
             className="absolute -inset-[4px] rounded-[22px] pointer-events-none"
-            style={{ background: `radial-gradient(ellipse at 50% 30%, ${a}60, transparent 70%)`, blur: "24px" }}
+            style={{ background: `radial-gradient(ellipse at 50% 30%, ${a}60, transparent 70%)`, filter: "blur(24px)" }}
             animate={{ opacity: [0.55, 0.9, 0.55] }}
             transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
           />
