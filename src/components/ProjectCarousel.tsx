@@ -19,7 +19,7 @@ import { projects } from "@/data";
 const PALETTES: Record<string, { a: string; b: string; bg: string }> = {
   "idp-project": { a: "#00d2ff", b: "#3a7bd5", bg: "#020e18" },
   "Network-Monitoring-System": { a: "#f7971e", b: "#ff512f", bg: "#100800" },
-  "AI-Lead-Qualification-Bot": { a: "#da22ff", b: "#ab63e9ff", bg: "#0d0118" },
+  "AI-Lead-Qualification-Bot": { a: "#a855f7", b: "#6366f1", bg: "#07020d" },
   "AI-Customer-Support-Assistant": { a: "#11998e", b: "#38ef7d", bg: "#00100d" },
 };
 const pal = (name: string) => PALETTES[name] ?? { a: "#2dd4bf", b: "#0ea5e9", bg: "#0d0e11" };
