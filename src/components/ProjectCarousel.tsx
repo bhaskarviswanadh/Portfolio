@@ -141,13 +141,6 @@ function CardVisual({ project, isActive }: { project: typeof projects[0]; isActi
         </div>
       </motion.div>
 
-      {/* project context badge */}
-      <div className="absolute top-3 left-3 z-10">
-        <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
-          style={{ background: `${a}22`, color: a, border: `1px solid ${a}40` }}>
-          {project.context}
-        </span>
-      </div>
     </div>
   );
 }
