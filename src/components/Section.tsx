@@ -7,9 +7,10 @@ type Props = {
   command: string;
   comment?: string;
   children: ReactNode;
+  className?: string;
 };
 
-export default function Section({ id, name, command, comment, children }: Props) {
+export default function Section({ id, name, command, comment, children, className }: Props) {
   return (
     <motion.section
       id={id}
@@ -18,7 +19,7 @@ export default function Section({ id, name, command, comment, children }: Props)
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative z-10 mx-auto w-full max-w-5xl scroll-mt-24 px-6 py-16 md:py-24"
+      className={`relative z-10 mx-auto w-full max-w-5xl px-6 ${className || "scroll-mt-24 py-16 md:py-24"}`}
     >
       <div className="mb-10">
         <h2 className="font-mono text-base text-accent md:text-lg">

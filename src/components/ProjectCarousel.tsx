@@ -171,10 +171,10 @@ interface LayoutProps { translateX: string; scale: number; opacity: number; rota
 function layout(pos: Pos): LayoutProps {
   switch (pos) {
     case "center": return { translateX: "0px", scale: 1, opacity: 1, rotateY: 0, z: 40, filter: "brightness(1)" };
-    case "left1": return { translateX: "-248px", scale: 0.84, opacity: 0.72, rotateY: 24, z: 20, filter: "brightness(0.55)" };
-    case "right1": return { translateX: "248px", scale: 0.84, opacity: 0.72, rotateY: -24, z: 20, filter: "brightness(0.55)" };
-    case "left2": return { translateX: "-410px", scale: 0.66, opacity: 0.28, rotateY: 42, z: 10, filter: "brightness(0.3)" };
-    case "right2": return { translateX: "410px", scale: 0.66, opacity: 0.28, rotateY: -42, z: 10, filter: "brightness(0.3)" };
+    case "left1": return { translateX: "-195px", scale: 0.84, opacity: 0.72, rotateY: 24, z: 20, filter: "brightness(0.55)" };
+    case "right1": return { translateX: "195px", scale: 0.84, opacity: 0.72, rotateY: -24, z: 20, filter: "brightness(0.55)" };
+    case "left2": return { translateX: "-310px", scale: 0.66, opacity: 0.28, rotateY: 42, z: 10, filter: "brightness(0.3)" };
+    case "right2": return { translateX: "310px", scale: 0.66, opacity: 0.28, rotateY: -42, z: 10, filter: "brightness(0.3)" };
     default: return { translateX: "0px", scale: 0.5, opacity: 0, rotateY: 0, z: 0, filter: "brightness(0)" };
   }
 }
@@ -209,10 +209,10 @@ function ProjectCard({ project, pos, onClick }: {
       /* position in the centre of the stage, then translate outward */
       className="absolute cursor-pointer select-none"
       style={{
-        width: "clamp(220px, 28vw, 320px)",
+        width: "clamp(190px, 22vw, 270px)",
         left: "50%",
         top: 0,
-        marginLeft: "calc(clamp(220px, 28vw, 320px) / -2)",
+        marginLeft: "calc(clamp(190px, 22vw, 270px) / -2)",
         zIndex: lyt.z,
         transformStyle: "preserve-3d",
       }}
@@ -262,7 +262,7 @@ function ProjectCard({ project, pos, onClick }: {
           }}
         >
           {/* ── Visual hero (top ~55% of card) ── */}
-          <div className="relative overflow-hidden flex-shrink-0" style={{ height: "clamp(170px, 22vw, 260px)" }}>
+          <div className="relative overflow-hidden flex-shrink-0" style={{ height: "clamp(130px, 14vw, 180px)" }}>
             <CardVisual project={project} isActive={isActive} />
           </div>
 
@@ -387,6 +387,7 @@ export default function ProjectCarousel() {
       name="Projects"
       command="terraform plan ./projects"
       comment="# open-source projects — infrastructure and platform tooling"
+      className="scroll-mt-14 pt-4 pb-10 md:pt-6 md:pb-12"
     >
       {/* ── Ambient background ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10">
@@ -418,7 +419,7 @@ export default function ProjectCarousel() {
       <div
         className="relative mx-auto"
         style={{
-          height: "clamp(440px, 58vw, 600px)",
+          height: "clamp(340px, 42vw, 415px)",
           maxWidth: "960px",
           perspective: "1800px",
           perspectiveOrigin: "50% 38%",
@@ -442,7 +443,7 @@ export default function ProjectCarousel() {
       </div>
 
       {/* ── Navigation controls ── */}
-      <div className="mt-10 flex items-center justify-center gap-5">
+      <div className="mt-6 flex items-center justify-center gap-5">
         <motion.button onClick={prev}
           whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.9 }}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-iron bg-obsidian/80 text-muted backdrop-blur-sm transition-colors hover:border-accent/60 hover:text-accent"
@@ -468,7 +469,7 @@ export default function ProjectCarousel() {
       </div>
 
       {/* ── Counter ── */}
-      <p className="mt-3 text-center font-mono text-[11px] text-muted/50">
+      <p className="mt-2 text-center font-mono text-[11px] text-muted/50">
         <span className="text-accent">{String(active + 1).padStart(2, "0")}</span>
         {" / "}
         {String(total).padStart(2, "0")}
