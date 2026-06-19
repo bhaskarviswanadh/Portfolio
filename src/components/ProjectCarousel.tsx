@@ -253,6 +253,7 @@ function ProjectCard({ project, pos, onClick }: {
         <div
           className="relative flex flex-col overflow-hidden rounded-[20px]"
           style={{
+            height: "390px",
             background: "linear-gradient(165deg, rgba(22,24,32,0.96) 0%, rgba(14,15,20,0.98) 100%)",
             border: `1.5px solid ${isActive ? a + "50" : "rgba(255,255,255,0.055)"}`,
             backdropFilter: "blur(24px)",
@@ -261,79 +262,73 @@ function ProjectCard({ project, pos, onClick }: {
               : "0 24px 60px rgba(0,0,0,0.65)",
           }}
         >
-          {/* ── Visual hero (top ~55% of card) ── */}
+          {/* ── Visual hero (top portion of card) ── */}
           <div className="relative overflow-hidden flex-shrink-0" style={{ height: "clamp(130px, 14vw, 180px)" }}>
             <CardVisual project={project} isActive={isActive} />
           </div>
 
           {/* ── Info panel ── */}
-          <div className="flex flex-col flex-1 px-5 py-4">
-            <h3
-              className="font-mono font-bold tracking-tight leading-snug"
-              style={{ fontSize: "clamp(12px, 1.3vw, 15px)", color: isActive ? "#fff" : "rgba(255,255,255,0.55)" }}
-            >
-              {project.name}
-            </h3>
+          <div className="flex flex-col flex-1 px-5 py-4 justify-between">
+            <div>
+              <h3
+                className="font-mono font-bold tracking-tight leading-snug"
+                style={{ fontSize: "clamp(12px, 1.3vw, 15px)", color: isActive ? "#fff" : "rgba(255,255,255,0.55)" }}
+              >
+                {project.name}
+              </h3>
 
-            <AnimatePresence mode="wait">
-              {isActive ? (
-                <motion.p key="full"
-                  className="mt-2 leading-relaxed"
-                  style={{ fontSize: "clamp(10px, 0.95vw, 12px)", color: "rgba(255,255,255,0.5)" }}
-                  initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.28 }}
-                >
-                  {project.summary ?? project.description.slice(0, 120) + "…"}
-                </motion.p>
-              ) : (
-                <motion.p key="short"
-                  className="mt-2 line-clamp-2 leading-relaxed"
-                  style={{ fontSize: "clamp(9px, 0.85vw, 11px)", color: "rgba(255,255,255,0.25)" }}
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {project.summary ?? project.description}
-                </motion.p>
-              )}
-            </AnimatePresence>
-
-            {/* tech tags */}
-            <div className="mt-3 flex flex-wrap gap-1">
-              {project.tech.slice(0, isActive ? 9 : 3).map(t => (
-                <span key={t}
-                  className="font-mono rounded"
-                  style={{
-                    fontSize: 9, padding: "2px 6px",
-                    background: `${tc(t)}16`,
-                    color: isActive ? tc(t) : "rgba(255,255,255,0.28)",
-                    border: `1px solid ${tc(t)}${isActive ? "38" : "18"}`,
-                  }}
-                >{t}</span>
-              ))}
+              <p
+                className="mt-2 line-clamp-3 leading-relaxed"
+                style={{ fontSize: "clamp(9px, 0.9vw, 11px)", color: isActive ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)" }}
+              >
+                {project.summary ?? project.description}
+              </p>
             </div>
 
-            {/* GitHub button — active card only */}
-            <AnimatePresence>
-              {isActive && project.link && (
-                <motion.div className="mt-4"
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.25, delay: 0.06 }}
-                >
-                  <a href={project.link} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg font-mono font-semibold transition-all hover:scale-[1.04] active:scale-95"
+            <div>
+              {/* tech tags */}
+              <div className="mt-2 flex flex-wrap gap-1">
+                {project.tech.slice(0, 3).map(t => (
+                  <span key={t}
+                    className="font-mono rounded"
                     style={{
-                      fontSize: 11, padding: "8px 16px",
-                      background: `linear-gradient(135deg, ${a}, ${a}99)`,
-                      color: "#03110f",
-                      boxShadow: `0 4px 20px ${a}45`,
+                      fontSize: 9, padding: "2px 6px",
+                      background: `${tc(t)}16`,
+                      color: isActive ? tc(t) : "rgba(255,255,255,0.28)",
+                      border: `1px solid ${tc(t)}${isActive ? "38" : "18"}`,
                     }}
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <GithubIcon /> View on GitHub <ArrowUpRightIcon />
-                  </a>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  >{t}</span>
+                ))}
+              </div>
+
+              {/* GitHub button placeholder area */}
+              <div className="mt-3 min-h-[32px] flex items-center">
+                <AnimatePresence>
+                  {isActive && project.link && (
+                    <motion.div
+                      className="w-full"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <a href={project.link} target="_blank" rel="noopener noreferrer"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-lg font-mono font-semibold transition-all hover:scale-[1.02] active:scale-98"
+                        style={{
+                          fontSize: 11, padding: "6px 12px",
+                          background: `linear-gradient(135deg, ${a}, ${a}99)`,
+                          color: "#03110f",
+                          boxShadow: `0 4px 15px ${a}45`,
+                        }}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <GithubIcon /> View on GitHub <ArrowUpRightIcon />
+                      </a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>
