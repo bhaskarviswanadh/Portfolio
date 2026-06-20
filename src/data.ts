@@ -33,7 +33,7 @@ export type Cert = {
 export const profile = {
   name: "Bhaskar Viswanadh Devisetti",
   role: "Cloud & DevOps Engineer",
-  location: "Vizianagaram, India",
+  location: "Kakinada, India",
   availability: "Open to Cloud & DevOps opportunities",
   summary:
     "Passionate Cloud & DevOps engineer with hands-on experience in containerization, Kubernetes orchestration, CI/CD automation, and network infrastructure. I build platforms that are reliable, automated, and developer-friendly — from a single `idp deploy` command to full network monitoring stacks on AWS.",
