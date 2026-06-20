@@ -10,14 +10,6 @@ export default function ExperienceList() {
       comment="# internship experience in network operations & infrastructure"
     >
       <div className="space-y-4">
-        {/* column header, kubectl-style */}
-        <div className="hidden grid-cols-12 gap-4 px-4 font-mono text-xs uppercase tracking-wider text-muted md:grid">
-          <span className="col-span-3">role</span>
-          <span className="col-span-5">name</span>
-          <span className="col-span-2">location</span>
-          <span className="col-span-2">duration</span>
-        </div>
-
         {experience.map((job) => (
           <div
             key={job.id}
