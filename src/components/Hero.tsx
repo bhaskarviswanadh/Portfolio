@@ -23,7 +23,7 @@ function TerminalPanel() {
         {"\n"} {"    "}focus: <span className="text-accent">cloud-infra</span>
         {"\n"}
         <span className="text-muted">spec:</span>
-        {"\n"} {"  "}education: B.Tech CSE (Networks){"\n"} {"  "}cgpa: 9.3{"\n"} {"  "}stack: [kubernetes, docker, go, aws]{"\n"}
+        {"\n"} {"  "}education: B.Tech CSE (Networks){"\n"} {"  "}cgpa: 9.3{"\n"} {"  "}stack: [kubernetes, docker, linux, go, aws]{"\n"}
         <span className="text-muted">status:</span>
         {"\n"} {"  "}phase: <span className="text-ok">Open to Work</span>
         <span className="cursor-blink" />
