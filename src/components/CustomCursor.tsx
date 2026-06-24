@@ -1,25 +1,20 @@
 /**
- * CustomCursor — premium dot-plus-ring cursor
+ * CustomCursor — Terminal Targeting Reticle
  *
- * Architecture:
- *  • Inner dot  (5 px)  — snaps to raw mouse coords instantly via RAF
- *  • Outer ring (32 px) — smooth lag follower (10 % ease per frame)
+ * 3-layer architecture:
+ *  1. Aura       — 160px soft radial glow, slowest follow (5% ease)
+ *  2. Reticle    — 4 corner L-brackets, medium follow (11% ease)
+ *  3. Dot        — 5px sharp dot, instant (raw coords)
  *
  * States:
- *  "default"  — ring 32px circle, dot 5px white
- *  "text"     — ring 24px, dot same  (subtly smaller while reading)
- *  "link"     — ring 46px rounded-rect, faint teal fill, brighter border
- *  "clicking" — ring contracts to 28px, ripple emitted via CSS class
+ *  idle     → brackets 50px apart, dim teal
+ *  text     → brackets spread wider (58px), giving text room to breathe
+ *  link     → brackets converge (36px), bright + "lock-on" glow
+ *  clicking → brackets snap tight (28px) + CSS ripple bursts out
  *
- * Visibility guarantee:
- *  Dot = white (#fff) + teal box-shadow glow.
- *  Works on void-black bg, teal text, muted-grey text — always visible.
- *  Ring has a faint dark drop-shadow so it reads against the dark bg.
- *
- * Performance:
- *  transform-only updates via RAF — zero layout thrash.
- *  CSS handles all animations (ripple, dot-ping).
- *  No blend modes, no weird icons, no mix-mode weirdness.
+ * Visibility: reticle wraps OUTSIDE content (not over it),
+ * so it reads clearly on any background or text color.
+ * Center dot is white + teal shadow = visible everywhere.
  */
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -30,143 +25,157 @@ const SEL_LINK =
   '[tabindex]:not([tabindex="-1"]), .cursor-pointer';
 
 const SEL_TEXT =
-  "p, h1, h2, h3, h4, h5, h6, li, pre, code, blockquote, span, strong, em";
+  "p, h1, h2, h3, h4, h5, h6, li, pre, code, blockquote";
 
 /* ─── Types ──────────────────────────────────────────────────── */
-type Mode = "default" | "text" | "link" | "clicking";
+type Mode = "idle" | "text" | "link" | "clicking";
 
-interface Ripple {
-  id:   number;
-  x:    number;
-  y:    number;
-}
+interface Ripple { id: number; x: number; y: number; }
 
 let uid = 0;
 
-/* ─── Geometry per mode ──────────────────────────────────────── */
-const RING: Record<Mode, { size: number; radius: string; borderColor: string; bg: string; shadow: string }> = {
-  default: {
-    size:        32,
-    radius:      "50%",
-    borderColor: "rgba(45,212,191,0.55)",
-    bg:          "transparent",
-    shadow:      "0 0 0 0.5px rgba(0,0,0,0.5), 0 0 8px rgba(45,212,191,0.15)",
+/* ─── Per-state config ───────────────────────────────────────── */
+const CFG: Record<Mode, {
+  bracketGap:  number;   /* gap between opposing brackets */
+  bracketSize: number;   /* L-arm length in px */
+  weight:      string;   /* border width */
+  color:       string;   /* bracket color */
+  auraScale:   number;   /* aura radial opacity multiplier */
+}> = {
+  idle: {
+    bracketGap:  50,
+    bracketSize: 12,
+    weight:      "1.5px",
+    color:       "rgba(45,212,191,0.65)",
+    auraScale:   1,
   },
   text: {
-    size:        24,
-    radius:      "50%",
-    borderColor: "rgba(45,212,191,0.4)",
-    bg:          "transparent",
-    shadow:      "0 0 0 0.5px rgba(0,0,0,0.5)",
+    bracketGap:  58,    /* wider — frames the text being read */
+    bracketSize: 10,
+    weight:      "1.5px",
+    color:       "rgba(45,212,191,0.45)",
+    auraScale:   0.7,
   },
   link: {
-    size:        46,
-    radius:      "10px",
-    borderColor: "rgba(45,212,191,0.85)",
-    bg:          "rgba(45,212,191,0.05)",
-    shadow:      "0 0 0 0.5px rgba(0,0,0,0.4), 0 0 18px rgba(45,212,191,0.3)",
+    bracketGap:  36,    /* converge inward — "locking on" */
+    bracketSize: 13,
+    weight:      "2px",
+    color:       "rgba(45,212,191,1)",
+    auraScale:   2.2,
   },
   clicking: {
-    size:        28,
-    radius:      "50%",
-    borderColor: "rgba(45,212,191,1)",
-    bg:          "transparent",
-    shadow:      "0 0 0 0.5px rgba(0,0,0,0.5), 0 0 20px rgba(45,212,191,0.5)",
+    bracketGap:  28,    /* snap closed on click */
+    bracketSize: 13,
+    weight:      "2px",
+    color:       "rgba(45,212,191,1)",
+    auraScale:   3,
   },
-};
-
-const DOT_SIZE: Record<Mode, number> = {
-  default: 5,
-  text:    5,
-  link:    4,
-  clicking:6,
 };
 
 /* ─── Component ──────────────────────────────────────────────── */
 export default function CustomCursor() {
-  /* Never render on touch devices */
-  const isTouch = typeof window !== "undefined"
-    ? window.matchMedia("(pointer: coarse)").matches
-    : false;
+  const isTouch =
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches;
 
-  const [visible, setVisible] = useState(false);
-  const [mode,    setMode]    = useState<Mode>("default");
-  const [ripples, setRipples] = useState<Ripple[]>([]);
-  const [dotPing, setDotPing] = useState(false);
+  const [visible,  setVisible]  = useState(false);
+  const [mode,     setMode]     = useState<Mode>("idle");
+  const [ripples,  setRipples]  = useState<Ripple[]>([]);
 
-  /* Position refs — no state, mutated every RAF */
-  const raw      = useRef({ x: -300, y: -300 });
-  const follower = useRef({ x: -300, y: -300 });
+  /* Position accumulators */
+  const rawPos     = useRef({ x: -400, y: -400 });
+  const reticlePos = useRef({ x: -400, y: -400 });
+  const auraPos    = useRef({ x: -400, y: -400 });
 
-  /* DOM refs — transform applied directly for zero-repaint */
-  const dotRef  = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
+  /* DOM refs — driven by RAF, zero React re-renders for motion */
+  const dotEl     = useRef<HTMLDivElement>(null);
+  const reticleEl = useRef<HTMLDivElement>(null);
+  const auraEl    = useRef<HTMLDivElement>(null);
 
-  const rafId       = useRef(0);
-  const isDown      = useRef(false);
-  const prevMode    = useRef<Mode>("default");
+  const rafId    = useRef(0);
+  const isDown   = useRef(false);
+  const prevMode = useRef<Mode>("idle");
 
   /* ── Mode resolver ───────────────────────────────────────── */
-  const resolveMode = useCallback((x: number, y: number): Mode => {
-    if (isDown.current) return "clicking";
-    const el = document.elementFromPoint(x, y);
-    if (!el) return "default";
-    if (el.closest(SEL_LINK)) return "link";
-    if (el.closest(SEL_TEXT)) return "text";
-    return "default";
-  }, []);
+  const resolveMode = useCallback(
+    (x: number, y: number): Mode => {
+      if (isDown.current) return "clicking";
+      const el = document.elementFromPoint(x, y);
+      if (!el) return "idle";
+      if (el.closest(SEL_LINK)) return "link";
+      if (el.closest(SEL_TEXT)) return "text";
+      return "idle";
+    },
+    []
+  );
 
   /* ── Mouse handlers ──────────────────────────────────────── */
-  const onMove = useCallback((e: MouseEvent) => {
-    raw.current = { x: e.clientX, y: e.clientY };
-    if (!visible) setVisible(true);
+  const onMove = useCallback(
+    (e: MouseEvent) => {
+      rawPos.current = { x: e.clientX, y: e.clientY };
+      if (!visible) setVisible(true);
 
-    const next = resolveMode(e.clientX, e.clientY);
-    if (next !== prevMode.current) {
+      const next = resolveMode(e.clientX, e.clientY);
+      if (next !== prevMode.current) {
+        prevMode.current = next;
+        setMode(next);
+      }
+    },
+    [visible, resolveMode]
+  );
+
+  const onDown = useCallback(
+    (e: MouseEvent) => {
+      isDown.current = true;
+      prevMode.current = "clicking";
+      setMode("clicking");
+
+      /* Fire ripple — CSS animates it, setTimeout cleans it up */
+      const r: Ripple = { id: uid++, x: e.clientX, y: e.clientY };
+      setRipples((prev) => [...prev.slice(-4), r]);
+      setTimeout(
+        () => setRipples((prev) => prev.filter((p) => p.id !== r.id)),
+        680
+      );
+    },
+    []
+  );
+
+  const onUp = useCallback(
+    (e: MouseEvent) => {
+      isDown.current = false;
+      const next = resolveMode(e.clientX, e.clientY);
       prevMode.current = next;
       setMode(next);
-    }
-  }, [visible, resolveMode]);
+    },
+    [resolveMode]
+  );
 
-  const onDown = useCallback((e: MouseEvent) => {
-    isDown.current = true;
-    prevMode.current = "clicking";
-    setMode("clicking");
-
-    /* Dot ping animation */
-    setDotPing(false);
-    requestAnimationFrame(() => setDotPing(true));
-    setTimeout(() => setDotPing(false), 320);
-
-    /* Emit ripple */
-    const r: Ripple = { id: uid++, x: e.clientX, y: e.clientY };
-    setRipples(prev => [...prev.slice(-4), r]);
-    /* Auto-remove after animation finishes */
-    setTimeout(() => {
-      setRipples(prev => prev.filter(p => p.id !== r.id));
-    }, 620);
-  }, []);
-
-  const onUp = useCallback((e: MouseEvent) => {
-    isDown.current = false;
-    const next = resolveMode(e.clientX, e.clientY);
-    prevMode.current = next;
-    setMode(next);
-  }, [resolveMode]);
-
-  /* ── RAF animation loop ──────────────────────────────────── */
+  /* ── RAF loop ────────────────────────────────────────────── */
   const tick = useCallback(() => {
-    /* Outer ring eases toward raw position (magnetic lag) */
-    follower.current.x += (raw.current.x - follower.current.x) * 0.1;
-    follower.current.y += (raw.current.y - follower.current.y) * 0.1;
+    /* Reticle: 11 % ease — snappy but smooth */
+    reticlePos.current.x +=
+      (rawPos.current.x - reticlePos.current.x) * 0.11;
+    reticlePos.current.y +=
+      (rawPos.current.y - reticlePos.current.y) * 0.11;
 
-    if (dotRef.current) {
-      dotRef.current.style.transform =
-        `translate(${raw.current.x}px, ${raw.current.y}px)`;
+    /* Aura: 5 % ease — dreamy trail */
+    auraPos.current.x +=
+      (rawPos.current.x - auraPos.current.x) * 0.05;
+    auraPos.current.y +=
+      (rawPos.current.y - auraPos.current.y) * 0.05;
+
+    if (dotEl.current) {
+      dotEl.current.style.transform =
+        `translate(${rawPos.current.x}px, ${rawPos.current.y}px)`;
     }
-    if (ringRef.current) {
-      ringRef.current.style.transform =
-        `translate(${follower.current.x}px, ${follower.current.y}px)`;
+    if (reticleEl.current) {
+      reticleEl.current.style.transform =
+        `translate(${reticlePos.current.x}px, ${reticlePos.current.y}px)`;
+    }
+    if (auraEl.current) {
+      auraEl.current.style.transform =
+        `translate(${auraPos.current.x}px, ${auraPos.current.y}px)`;
     }
 
     rafId.current = requestAnimationFrame(tick);
@@ -194,102 +203,168 @@ export default function CustomCursor() {
     };
   }, [isTouch, onMove, onDown, onUp, tick]);
 
-  /* Touch bail-out */
   if (isTouch) return null;
 
-  /* ── Derived geometry ────────────────────────────────────── */
-  const ring    = RING[mode];
-  const dotSize = DOT_SIZE[mode];
+  /* ── Derived values ──────────────────────────────────────── */
+  const { bracketGap, bracketSize, weight, color, auraScale } = CFG[mode];
+  const half    = bracketGap / 2;
+  const bracket = `${weight} solid ${color}`;
+
+  /* drop-shadow creates true outer glow on non-rectangular shapes */
+  const reticleFilter =
+    mode === "link" || mode === "clicking"
+      ? "drop-shadow(0 0 5px rgba(45,212,191,0.9)) drop-shadow(0 0 12px rgba(45,212,191,0.4))"
+      : "drop-shadow(0 0 3px rgba(45,212,191,0.3))";
 
   return (
     <>
-      {/* ── Click ripples — CSS-animated, no RAF ────────────── */}
-      {ripples.map(r => (
+      {/* ── Click ripples — CSS keyframe, zero RAF overhead ───── */}
+      {ripples.map((r) => (
         <div
           key={r.id}
           className="cursor-ripple"
           style={{
             position:     "fixed",
-            top:          r.y - 22,
-            left:         r.x - 22,
-            width:        44,
-            height:       44,
+            top:          r.y - 26,
+            left:         r.x - 26,
+            width:        52,
+            height:       52,
             borderRadius: "50%",
-            border:       "1.5px solid rgba(45,212,191,0.7)",
+            border:       "1.5px solid rgba(45,212,191,0.85)",
             pointerEvents:"none",
-            zIndex:       99995,
+            zIndex:       99994,
           }}
         />
       ))}
 
-      {/* ── Outer ring — smooth follower ─────────────────────── */}
+      {/* ── Aura — soft radial glow, floats behind everything ─── */}
       <div
-        ref={ringRef}
+        ref={auraEl}
         style={{
           position:     "fixed",
           top:          0,
           left:         0,
-          width:        ring.size,
-          height:       ring.size,
-          /* Centre on cursor */
-          marginLeft:   -ring.size / 2,
-          marginTop:    -ring.size / 2,
-          borderRadius: ring.radius,
-          border:       `1.5px solid ${ring.borderColor}`,
-          background:   ring.bg,
-          boxShadow:    ring.shadow,
+          width:        180,
+          height:       180,
+          marginLeft:   -90,
+          marginTop:    -90,
+          borderRadius: "50%",
+          background:   `radial-gradient(circle, rgba(45,212,191,${0.055 * auraScale}) 0%, rgba(45,212,191,${0.02 * auraScale}) 40%, transparent 70%)`,
           pointerEvents:"none",
-          zIndex:       99998,
+          zIndex:       99995,
           opacity:      visible ? 1 : 0,
-          /*
-           * Spring-style transitions on geometry.
-           * transform is NOT transitioned — that's handled by RAF.
-           */
-          transition:
-            "width 220ms cubic-bezier(0.34,1.56,0.64,1)," +
-            "height 220ms cubic-bezier(0.34,1.56,0.64,1)," +
-            "margin 220ms cubic-bezier(0.34,1.56,0.64,1)," +
-            "border-radius 200ms ease," +
-            "border-color 150ms ease," +
-            "background 200ms ease," +
-            "box-shadow 150ms ease," +
-            "opacity 250ms ease",
-          willChange: "transform, width, height",
+          transition:   "opacity 300ms ease, background 250ms ease",
+          willChange:   "transform",
         }}
       />
 
-      {/* ── Inner dot — instant, always visible ──────────────── */}
+      {/* ── Reticle — 4 corner L-brackets ─────────────────────── */}
       {/*
-       * White fill + teal glow = visible on void-black, graphite,
-       * teal accent text (#2dd4bf), muted grey text — everywhere.
-       * No blend modes, no hacks.
+       * The wrapper div is sized to bracketGap × bracketGap and
+       * centred on the cursor. Each corner span is positioned
+       * in its corner using absolute coords. The wrapper's
+       * CSS size/margin transitions handle the convergence
+       * animation; the transform is driven by RAF separately.
        */}
       <div
-        ref={dotRef}
-        className={dotPing ? "cursor-dot-ping" : undefined}
+        ref={reticleEl}
         style={{
           position:     "fixed",
           top:          0,
           left:         0,
-          width:        dotSize,
-          height:       dotSize,
-          marginLeft:   -dotSize / 2,
-          marginTop:    -dotSize / 2,
+          width:        bracketGap,
+          height:       bracketGap,
+          marginLeft:   -half,
+          marginTop:    -half,
+          pointerEvents:"none",
+          zIndex:       99998,
+          opacity:      visible ? 1 : 0,
+          filter:       reticleFilter,
+          transition:
+            "width 260ms cubic-bezier(0.34,1.56,0.64,1)," +
+            "height 260ms cubic-bezier(0.34,1.56,0.64,1)," +
+            "margin 260ms cubic-bezier(0.34,1.56,0.64,1)," +
+            "filter 180ms ease," +
+            "opacity 260ms ease",
+          willChange: "transform, width, height",
+        }}
+      >
+        {/* ┌ top-left */}
+        <span style={{
+          position:    "absolute",
+          top:         0, left: 0,
+          width:       bracketSize,
+          height:      bracketSize,
+          borderTop:   bracket,
+          borderLeft:  bracket,
+          transition:  "width 260ms cubic-bezier(0.34,1.56,0.64,1), height 260ms cubic-bezier(0.34,1.56,0.64,1), border-color 180ms ease, border-width 180ms ease",
+        }} />
+
+        {/* ┐ top-right */}
+        <span style={{
+          position:    "absolute",
+          top:         0, right: 0,
+          width:       bracketSize,
+          height:      bracketSize,
+          borderTop:   bracket,
+          borderRight: bracket,
+          transition:  "width 260ms cubic-bezier(0.34,1.56,0.64,1), height 260ms cubic-bezier(0.34,1.56,0.64,1), border-color 180ms ease, border-width 180ms ease",
+        }} />
+
+        {/* └ bottom-left */}
+        <span style={{
+          position:       "absolute",
+          bottom:         0, left: 0,
+          width:          bracketSize,
+          height:         bracketSize,
+          borderBottom:   bracket,
+          borderLeft:     bracket,
+          transition:     "width 260ms cubic-bezier(0.34,1.56,0.64,1), height 260ms cubic-bezier(0.34,1.56,0.64,1), border-color 180ms ease, border-width 180ms ease",
+        }} />
+
+        {/* ┘ bottom-right */}
+        <span style={{
+          position:       "absolute",
+          bottom:         0, right: 0,
+          width:          bracketSize,
+          height:         bracketSize,
+          borderBottom:   bracket,
+          borderRight:    bracket,
+          transition:     "width 260ms cubic-bezier(0.34,1.56,0.64,1), height 260ms cubic-bezier(0.34,1.56,0.64,1), border-color 180ms ease, border-width 180ms ease",
+        }} />
+      </div>
+
+      {/* ── Center dot — white + teal shadow = always visible ──── */}
+      {/*
+       * White fill reads clearly on:
+       *  - void-black background (#0d0e11) ✓
+       *  - teal accent text (#2dd4bf)      ✓
+       *  - muted grey text (#8b909c)       ✓
+       *  - bright white headings (#fff)    ✓ (teal ring contrasts)
+       * No blend-mode tricks needed.
+       */}
+      <div
+        ref={dotEl}
+        style={{
+          position:     "fixed",
+          top:          0,
+          left:         0,
+          width:        5,
+          height:       5,
+          marginLeft:   -2.5,
+          marginTop:    -2.5,
           borderRadius: "50%",
-          /* White core, teal halo — visible on any bg */
           background:   "#ffffff",
           boxShadow:
-            "0 0 0 1.5px rgba(45,212,191,0.8)," +   /* teal ring  */
-            "0 0 10px rgba(45,212,191,0.65),"  +    /* teal glow  */
-            "0 0 2px rgba(0,0,0,0.6)",              /* dark shadow for dark bg */
+            `0 0 0 1.5px ${color},` +           /* teal ring matches state */
+            "0 0 10px rgba(45,212,191,0.75)," + /* teal outer glow */
+            "0 0 2px rgba(0,0,0,0.6)",           /* dark halo for bg contrast */
           pointerEvents:"none",
           zIndex:       99999,
           opacity:      visible ? 1 : 0,
           transition:
-            "width 140ms ease," +
-            "height 140ms ease," +
-            "margin 140ms ease," +
-            "opacity 250ms ease",
+            "opacity 260ms ease," +
+            "box-shadow 150ms ease",
           willChange: "transform",
         }}
       />
