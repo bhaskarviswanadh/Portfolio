@@ -183,3 +183,22 @@ body::before {
   perspective: 1400px;
   perspective-origin: 50% 40%;
 }
+
+/* ── Custom cursor ripple (CSS-animated, no React RAF needed) ── */
+@keyframes cursor-ripple {
+  0%   { transform: scale(0.4); opacity: 0.75; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+.cursor-ripple {
+  animation: cursor-ripple 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Cursor dot pulse on click ──────────────────────────────── */
+@keyframes dot-ping {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.8); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.cursor-dot-ping {
+  animation: dot-ping 0.3s ease-out;
+}

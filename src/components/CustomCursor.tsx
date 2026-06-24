@@ -1,233 +1,296 @@
+/**
+ * CustomCursor — premium dot-plus-ring cursor
+ *
+ * Architecture:
+ *  • Inner dot  (5 px)  — snaps to raw mouse coords instantly via RAF
+ *  • Outer ring (32 px) — smooth lag follower (10 % ease per frame)
+ *
+ * States:
+ *  "default"  — ring 32px circle, dot 5px white
+ *  "text"     — ring 24px, dot same  (subtly smaller while reading)
+ *  "link"     — ring 46px rounded-rect, faint teal fill, brighter border
+ *  "clicking" — ring contracts to 28px, ripple emitted via CSS class
+ *
+ * Visibility guarantee:
+ *  Dot = white (#fff) + teal box-shadow glow.
+ *  Works on void-black bg, teal text, muted-grey text — always visible.
+ *  Ring has a faint dark drop-shadow so it reads against the dark bg.
+ *
+ * Performance:
+ *  transform-only updates via RAF — zero layout thrash.
+ *  CSS handles all animations (ripple, dot-ping).
+ *  No blend modes, no weird icons, no mix-mode weirdness.
+ */
+
 import { useEffect, useRef, useState, useCallback } from "react";
 
-/* ─── Types ─────────────────────────────────────────────────── */
-interface TrailDot {
-  id: number;
-  x: number;
-  y: number;
-  alpha: number;
-  scale: number;
+/* ─── Selectors ──────────────────────────────────────────────── */
+const SEL_LINK =
+  'a, button, [role="button"], input, textarea, select, label, summary, ' +
+  '[tabindex]:not([tabindex="-1"]), .cursor-pointer';
+
+const SEL_TEXT =
+  "p, h1, h2, h3, h4, h5, h6, li, pre, code, blockquote, span, strong, em";
+
+/* ─── Types ──────────────────────────────────────────────────── */
+type Mode = "default" | "text" | "link" | "clicking";
+
+interface Ripple {
+  id:   number;
+  x:    number;
+  y:    number;
 }
 
-/* ─── Helpers ────────────────────────────────────────────────── */
-const INTERACTIVE =
-  'a, button, [role="button"], input, textarea, select, label, [tabindex]:not([tabindex="-1"]), .cursor-pointer';
+let uid = 0;
 
-let trailId = 0;
+/* ─── Geometry per mode ──────────────────────────────────────── */
+const RING: Record<Mode, { size: number; radius: string; borderColor: string; bg: string; shadow: string }> = {
+  default: {
+    size:        32,
+    radius:      "50%",
+    borderColor: "rgba(45,212,191,0.55)",
+    bg:          "transparent",
+    shadow:      "0 0 0 0.5px rgba(0,0,0,0.5), 0 0 8px rgba(45,212,191,0.15)",
+  },
+  text: {
+    size:        24,
+    radius:      "50%",
+    borderColor: "rgba(45,212,191,0.4)",
+    bg:          "transparent",
+    shadow:      "0 0 0 0.5px rgba(0,0,0,0.5)",
+  },
+  link: {
+    size:        46,
+    radius:      "10px",
+    borderColor: "rgba(45,212,191,0.85)",
+    bg:          "rgba(45,212,191,0.05)",
+    shadow:      "0 0 0 0.5px rgba(0,0,0,0.4), 0 0 18px rgba(45,212,191,0.3)",
+  },
+  clicking: {
+    size:        28,
+    radius:      "50%",
+    borderColor: "rgba(45,212,191,1)",
+    bg:          "transparent",
+    shadow:      "0 0 0 0.5px rgba(0,0,0,0.5), 0 0 20px rgba(45,212,191,0.5)",
+  },
+};
+
+const DOT_SIZE: Record<Mode, number> = {
+  default: 5,
+  text:    5,
+  link:    4,
+  clicking:6,
+};
 
 /* ─── Component ──────────────────────────────────────────────── */
 export default function CustomCursor() {
-  /* Hide on touch devices */
+  /* Never render on touch devices */
+  const isTouch = typeof window !== "undefined"
+    ? window.matchMedia("(pointer: coarse)").matches
+    : false;
+
   const [visible, setVisible] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const [clicking, setClicking] = useState(false);
-  const [trail, setTrail] = useState<TrailDot[]>([]);
+  const [mode,    setMode]    = useState<Mode>("default");
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const [dotPing, setDotPing] = useState(false);
 
-  /* Raw mouse position (instant) */
-  const rawPos = useRef({ x: -100, y: -100 });
+  /* Position refs — no state, mutated every RAF */
+  const raw      = useRef({ x: -300, y: -300 });
+  const follower = useRef({ x: -300, y: -300 });
 
-  /* Smoothed positions for outer ring (lags behind = "magnetic" feel) */
-  const outerPos = useRef({ x: -100, y: -100 });
+  /* DOM refs — transform applied directly for zero-repaint */
+  const dotRef  = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
-  /* Inner dot (follows raw instantly) */
-  const innerPos = useRef({ x: -100, y: -100 });
+  const rafId       = useRef(0);
+  const isDown      = useRef(false);
+  const prevMode    = useRef<Mode>("default");
 
-  /* DOM refs */
-  const outerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
+  /* ── Mode resolver ───────────────────────────────────────── */
+  const resolveMode = useCallback((x: number, y: number): Mode => {
+    if (isDown.current) return "clicking";
+    const el = document.elementFromPoint(x, y);
+    if (!el) return "default";
+    if (el.closest(SEL_LINK)) return "link";
+    if (el.closest(SEL_TEXT)) return "text";
+    return "default";
+  }, []);
 
-  /* RAF handle */
-  const rafRef = useRef<number>(0);
-
-  /* Trail throttle */
-  const lastTrail = useRef(0);
-
-  /* ── Mouse move ──────────────────────────────────────────── */
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    rawPos.current = { x: e.clientX, y: e.clientY };
+  /* ── Mouse handlers ──────────────────────────────────────── */
+  const onMove = useCallback((e: MouseEvent) => {
+    raw.current = { x: e.clientX, y: e.clientY };
     if (!visible) setVisible(true);
 
-    /* Spawn trail dot every ~30ms */
-    const now = Date.now();
-    if (now - lastTrail.current > 30) {
-      lastTrail.current = now;
-      const dot: TrailDot = {
-        id: trailId++,
-        x: e.clientX,
-        y: e.clientY,
-        alpha: 0.55,
-        scale: 1,
-      };
-      setTrail((prev) => [...prev.slice(-10), dot]);
+    const next = resolveMode(e.clientX, e.clientY);
+    if (next !== prevMode.current) {
+      prevMode.current = next;
+      setMode(next);
     }
+  }, [visible, resolveMode]);
 
-    /* Detect hover state */
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    setHovered(!!el?.closest(INTERACTIVE));
-  }, [visible]);
+  const onDown = useCallback((e: MouseEvent) => {
+    isDown.current = true;
+    prevMode.current = "clicking";
+    setMode("clicking");
 
-  const onMouseDown = useCallback(() => setClicking(true), []);
-  const onMouseUp   = useCallback(() => setClicking(false), []);
-  const onMouseLeave = useCallback(() => setVisible(false), []);
-  const onMouseEnter = useCallback(() => setVisible(true), []);
+    /* Dot ping animation */
+    setDotPing(false);
+    requestAnimationFrame(() => setDotPing(true));
+    setTimeout(() => setDotPing(false), 320);
+
+    /* Emit ripple */
+    const r: Ripple = { id: uid++, x: e.clientX, y: e.clientY };
+    setRipples(prev => [...prev.slice(-4), r]);
+    /* Auto-remove after animation finishes */
+    setTimeout(() => {
+      setRipples(prev => prev.filter(p => p.id !== r.id));
+    }, 620);
+  }, []);
+
+  const onUp = useCallback((e: MouseEvent) => {
+    isDown.current = false;
+    const next = resolveMode(e.clientX, e.clientY);
+    prevMode.current = next;
+    setMode(next);
+  }, [resolveMode]);
 
   /* ── RAF animation loop ──────────────────────────────────── */
-  const animate = useCallback(() => {
-    const ease = 0.1; // outer ring easing (lower = more lag = more "magnetic")
+  const tick = useCallback(() => {
+    /* Outer ring eases toward raw position (magnetic lag) */
+    follower.current.x += (raw.current.x - follower.current.x) * 0.1;
+    follower.current.y += (raw.current.y - follower.current.y) * 0.1;
 
-    outerPos.current.x += (rawPos.current.x - outerPos.current.x) * ease;
-    outerPos.current.y += (rawPos.current.y - outerPos.current.y) * ease;
-    innerPos.current.x = rawPos.current.x;
-    innerPos.current.y = rawPos.current.y;
-
-    if (outerRef.current) {
-      outerRef.current.style.transform = `translate(${outerPos.current.x}px, ${outerPos.current.y}px)`;
+    if (dotRef.current) {
+      dotRef.current.style.transform =
+        `translate(${raw.current.x}px, ${raw.current.y}px)`;
     }
-    if (innerRef.current) {
-      innerRef.current.style.transform = `translate(${innerPos.current.x}px, ${innerPos.current.y}px)`;
+    if (ringRef.current) {
+      ringRef.current.style.transform =
+        `translate(${follower.current.x}px, ${follower.current.y}px)`;
     }
 
-    rafRef.current = requestAnimationFrame(animate);
+    rafId.current = requestAnimationFrame(tick);
   }, []);
 
-  /* ── Trail fade-out ──────────────────────────────────────── */
+  /* ── Lifecycle ───────────────────────────────────────────── */
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTrail((prev) =>
-        prev
-          .map((d) => ({ ...d, alpha: d.alpha - 0.08, scale: d.scale * 0.88 }))
-          .filter((d) => d.alpha > 0)
-      );
-    }, 30);
-    return () => clearInterval(timer);
-  }, []);
+    if (isTouch) return;
 
-  /* ── Mount / unmount ─────────────────────────────────────── */
-  useEffect(() => {
-    /* Only enable on non-touch */
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    document.addEventListener("mousemove",  onMove,  { passive: true });
+    document.addEventListener("mousedown",  onDown);
+    document.addEventListener("mouseup",    onUp);
+    document.addEventListener("mouseleave", () => setVisible(false));
+    document.addEventListener("mouseenter", () => setVisible(true));
 
-    document.addEventListener("mousemove",  onMouseMove);
-    document.addEventListener("mousedown",  onMouseDown);
-    document.addEventListener("mouseup",    onMouseUp);
-    document.addEventListener("mouseleave", onMouseLeave);
-    document.addEventListener("mouseenter", onMouseEnter);
-
-    rafRef.current = requestAnimationFrame(animate);
-
-    /* Hide native cursor */
+    rafId.current = requestAnimationFrame(tick);
     document.body.style.cursor = "none";
 
     return () => {
-      document.removeEventListener("mousemove",  onMouseMove);
-      document.removeEventListener("mousedown",  onMouseDown);
-      document.removeEventListener("mouseup",    onMouseUp);
-      document.removeEventListener("mouseleave", onMouseLeave);
-      document.removeEventListener("mouseenter", onMouseEnter);
-      cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("mousemove",  onMove);
+      document.removeEventListener("mousedown",  onDown);
+      document.removeEventListener("mouseup",    onUp);
+      cancelAnimationFrame(rafId.current);
       document.body.style.cursor = "";
     };
-  }, [onMouseMove, onMouseDown, onMouseUp, onMouseLeave, onMouseEnter, animate]);
+  }, [isTouch, onMove, onDown, onUp, tick]);
 
-  if (window.matchMedia("(pointer: coarse)").matches) return null;
+  /* Touch bail-out */
+  if (isTouch) return null;
 
-  /* ── Derived states ──────────────────────────────────────── */
-  const isActive = hovered || clicking;
+  /* ── Derived geometry ────────────────────────────────────── */
+  const ring    = RING[mode];
+  const dotSize = DOT_SIZE[mode];
 
   return (
     <>
-      {/* ── Trail particles ─────────────────────────────────── */}
-      {trail.map((dot) => (
+      {/* ── Click ripples — CSS-animated, no RAF ────────────── */}
+      {ripples.map(r => (
         <div
-          key={dot.id}
-          className="cursor-trail-dot"
+          key={r.id}
+          className="cursor-ripple"
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: 5,
-            height: 5,
+            position:     "fixed",
+            top:          r.y - 22,
+            left:         r.x - 22,
+            width:        44,
+            height:       44,
             borderRadius: "50%",
-            background: "#2dd4bf",
-            pointerEvents: "none",
-            zIndex: 99997,
-            transform: `translate(${dot.x - 2.5}px, ${dot.y - 2.5}px) scale(${dot.scale})`,
-            opacity: dot.alpha,
-            willChange: "transform, opacity",
+            border:       "1.5px solid rgba(45,212,191,0.7)",
+            pointerEvents:"none",
+            zIndex:       99995,
           }}
         />
       ))}
 
-      {/* ── Outer ring (lagged / magnetic) ──────────────────── */}
+      {/* ── Outer ring — smooth follower ─────────────────────── */}
       <div
-        ref={outerRef}
+        ref={ringRef}
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: isActive ? (clicking ? 44 : 56) : 36,
-          height: isActive ? (clicking ? 44 : 56) : 36,
-          border: `1.5px solid ${clicking ? "rgba(45,212,191,0.95)" : "rgba(45,212,191,0.55)"}`,
-          borderRadius: hovered ? "10px" : "50%",
-          transform: "translate(-100px, -100px)",
-          /* Centre the ring on the cursor tip */
-          marginLeft: isActive ? (clicking ? -22 : -28) : -18,
-          marginTop:  isActive ? (clicking ? -22 : -28) : -18,
-          pointerEvents: "none",
-          zIndex: 99998,
-          opacity: visible ? 1 : 0,
-          /* All morphing transitions */
+          position:     "fixed",
+          top:          0,
+          left:         0,
+          width:        ring.size,
+          height:       ring.size,
+          /* Centre on cursor */
+          marginLeft:   -ring.size / 2,
+          marginTop:    -ring.size / 2,
+          borderRadius: ring.radius,
+          border:       `1.5px solid ${ring.borderColor}`,
+          background:   ring.bg,
+          boxShadow:    ring.shadow,
+          pointerEvents:"none",
+          zIndex:       99998,
+          opacity:      visible ? 1 : 0,
+          /*
+           * Spring-style transitions on geometry.
+           * transform is NOT transitioned — that's handled by RAF.
+           */
           transition:
-            "width 220ms cubic-bezier(0.34,1.56,0.64,1), " +
-            "height 220ms cubic-bezier(0.34,1.56,0.64,1), " +
-            "border-radius 220ms ease, " +
-            "margin 220ms cubic-bezier(0.34,1.56,0.64,1), " +
-            "border-color 150ms ease, " +
-            "opacity 200ms ease",
+            "width 220ms cubic-bezier(0.34,1.56,0.64,1)," +
+            "height 220ms cubic-bezier(0.34,1.56,0.64,1)," +
+            "margin 220ms cubic-bezier(0.34,1.56,0.64,1)," +
+            "border-radius 200ms ease," +
+            "border-color 150ms ease," +
+            "background 200ms ease," +
+            "box-shadow 150ms ease," +
+            "opacity 250ms ease",
           willChange: "transform, width, height",
-          /* Glow */
-          boxShadow: clicking
-            ? "0 0 18px rgba(45,212,191,0.55), 0 0 36px rgba(45,212,191,0.2)"
-            : hovered
-            ? "0 0 12px rgba(45,212,191,0.35)"
-            : "0 0 6px rgba(45,212,191,0.15)",
-          backdropFilter: hovered ? "blur(1px)" : "none",
         }}
-      >
-        {/* Corner accent ticks — terminal crosshair feel */}
-        {!hovered && (
-          <>
-            <span style={{ position:"absolute", top:-4,  left:-4,  width:6, height:6, borderTop:"1.5px solid #2dd4bf", borderLeft:"1.5px solid #2dd4bf" }} />
-            <span style={{ position:"absolute", top:-4,  right:-4, width:6, height:6, borderTop:"1.5px solid #2dd4bf", borderRight:"1.5px solid #2dd4bf" }} />
-            <span style={{ position:"absolute", bottom:-4, left:-4,  width:6, height:6, borderBottom:"1.5px solid #2dd4bf", borderLeft:"1.5px solid #2dd4bf" }} />
-            <span style={{ position:"absolute", bottom:-4, right:-4, width:6, height:6, borderBottom:"1.5px solid #2dd4bf", borderRight:"1.5px solid #2dd4bf" }} />
-          </>
-        )}
-      </div>
+      />
 
-      {/* ── Inner dot (terminal block cursor) ───────────────── */}
+      {/* ── Inner dot — instant, always visible ──────────────── */}
+      {/*
+       * White fill + teal glow = visible on void-black, graphite,
+       * teal accent text (#2dd4bf), muted grey text — everywhere.
+       * No blend modes, no hacks.
+       */}
       <div
-        ref={innerRef}
+        ref={dotRef}
+        className={dotPing ? "cursor-dot-ping" : undefined}
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width:  clicking ? 6 : hovered ? 5 : 4,
-          height: clicking ? 9 : hovered ? 5 : 8,
-          borderRadius: hovered ? "50%" : "1px",
-          background: "#2dd4bf",
-          transform: "translate(-100px, -100px)",
-          marginLeft: clicking ? -3  : hovered ? -2.5 : -2,
-          marginTop:  clicking ? -4.5 : hovered ? -2.5 : -4,
-          pointerEvents: "none",
-          zIndex: 99999,
-          opacity: visible ? (clicking ? 0.9 : 1) : 0,
+          position:     "fixed",
+          top:          0,
+          left:         0,
+          width:        dotSize,
+          height:       dotSize,
+          marginLeft:   -dotSize / 2,
+          marginTop:    -dotSize / 2,
+          borderRadius: "50%",
+          /* White core, teal halo — visible on any bg */
+          background:   "#ffffff",
+          boxShadow:
+            "0 0 0 1.5px rgba(45,212,191,0.8)," +   /* teal ring  */
+            "0 0 10px rgba(45,212,191,0.65),"  +    /* teal glow  */
+            "0 0 2px rgba(0,0,0,0.6)",              /* dark shadow for dark bg */
+          pointerEvents:"none",
+          zIndex:       99999,
+          opacity:      visible ? 1 : 0,
           transition:
-            "width 150ms ease, height 150ms ease, " +
-            "border-radius 150ms ease, opacity 200ms ease, " +
-            "margin 150ms ease",
+            "width 140ms ease," +
+            "height 140ms ease," +
+            "margin 140ms ease," +
+            "opacity 250ms ease",
           willChange: "transform",
-          boxShadow: "0 0 8px rgba(45,212,191,0.9)",
         }}
       />
     </>
