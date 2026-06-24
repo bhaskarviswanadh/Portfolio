@@ -45,6 +45,22 @@ body {
   font-feature-settings: "liga" 0, "calt" 0;
 }
 
+/* Hide native cursor everywhere (custom cursor takes over) */
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+/* Restore cursor on touch / pointer: coarse devices — CSS fallback */
+@media (pointer: coarse) {
+  *,
+  *::before,
+  *::after {
+    cursor: auto !important;
+  }
+}
+
+
 /* Selection in accent */
 ::selection {
   background: var(--color-accent);

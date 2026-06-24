@@ -9,11 +9,13 @@ import SkillsList from "@/components/SkillsList";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import CommandPalette from "@/components/CommandPalette";
+import CustomCursor from "@/components/CustomCursor";
 
 function App() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="relative min-h-screen overflow-x-hidden bg-void text-fg">
+        <CustomCursor />
         <Nav />
         <main>
           <Hero />
