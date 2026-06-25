@@ -1,36 +1,8 @@
 import { motion } from "motion/react";
 import { profile } from "@/data";
 import TechMarquee from "@/components/TechMarquee";
+import AnimatedTerminalPanel from "@/components/AnimatedTerminalPanel";
 
-function TerminalPanel() {
-  return (
-    <div className="overflow-hidden rounded-lg border border-iron bg-obsidian font-mono text-[13px] leading-relaxed shadow-2xl shadow-black/40">
-      <div className="flex items-center gap-2 border-b border-iron bg-graphite px-4 py-2.5">
-        <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
-        <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-        <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
-        <span className="ml-2 text-xs text-muted">~/bhaskar</span>
-      </div>
-      <pre className="overflow-x-auto px-4 py-4 text-fg">
-        <span className="text-muted">❯</span>{" "}
-        <span className="text-accent">kubectl</span> get me -o yaml
-        {"\n"}
-        <span className="text-muted">apiVersion:</span> career/v1{"\n"}
-        <span className="text-muted">kind:</span> Engineer{"\n"}
-        <span className="text-muted">metadata:</span>
-        {"\n"} {"  "}name: bhaskar-viswanadh{"\n"} {"  "}labels:{"\n"} {"    "}
-        role: <span className="text-accent">devops</span>
-        {"\n"} {"    "}focus: <span className="text-accent">cloud-infra</span>
-        {"\n"}
-        <span className="text-muted">spec:</span>
-        {"\n"} {"  "}education: B.Tech CSE (Networks){"\n"} {"  "}cgpa: 9.3{"\n"} {"  "}stack: [kubernetes, docker, linux, go, aws]{"\n"}
-        <span className="text-muted">status:</span>
-        {"\n"} {"  "}phase: <span className="text-ok">Open to Work</span>
-        <span className="cursor-blink" />
-      </pre>
-    </div>
-  );
-}
 
 export default function Hero() {
   return (
@@ -100,7 +72,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
         >
-          <TerminalPanel />
+          <AnimatedTerminalPanel />
         </motion.div>
         </div>
       </div>
