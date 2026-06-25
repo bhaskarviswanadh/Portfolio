@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v6";
+const SESSION_KEY   = "terminal_intro_v7";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -498,12 +498,11 @@ export default function AnimatedTerminalPanel() {
         {/* RIGHT: portrait + identity card (pinned, no scroll) */}
         {showRight && (
           <div
-            className="flex-shrink-0 border-l border-iron flex flex-col overflow-hidden"
-            style={{ width: "195px" }}
+            className="terminal-portrait-container flex-shrink-0 border-l border-iron flex flex-col overflow-hidden w-[240px] md:w-[190px] lg:w-[250px] xl:w-[280px]"
           >
             {/* Portrait — revealed row by row from top */}
             <div
-              className="flex-1 overflow-hidden pl-2 pt-1"
+              className="flex-1 overflow-hidden pt-1"
               style={{ lineHeight: 0 }}
             >
               {rightRows.map((row, i) => (
@@ -511,8 +510,8 @@ export default function AnimatedTerminalPanel() {
                   key={i}
                   className="whitespace-pre text-accent select-none"
                   style={{
-                    fontSize:      "5.8px",
-                    lineHeight:    "6px",
+                    fontSize:      "var(--portrait-fs)",
+                    lineHeight:    "var(--portrait-lh)",
                     fontFamily:    '"JetBrains Mono", "Courier New", monospace',
                     letterSpacing: "-0.2px",
                   }}

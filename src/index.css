@@ -202,3 +202,33 @@ body::before {
 .cursor-dot-ping {
   animation: dot-ping 0.3s ease-out;
 }
+
+/* Responsive portrait sizes for the terminal */
+.terminal-portrait-container {
+  --portrait-fs: 4.0px;
+  --portrait-lh: 4.2px;
+}
+@media (min-width: 640px) {
+  .terminal-portrait-container {
+    --portrait-fs: 4.2px;
+    --portrait-lh: 4.4px;
+  }
+}
+@media (min-width: 768px) {
+  .terminal-portrait-container {
+    --portrait-fs: 3.0px;
+    --portrait-lh: 3.2px;
+  }
+}
+@media (min-width: 1024px) {
+  .terminal-portrait-container {
+    --portrait-fs: 4.2px;
+    --portrait-lh: 4.4px;
+  }
+}
+@media (min-width: 1280px) {
+  .terminal-portrait-container {
+    --portrait-fs: 4.8px;
+    --portrait-lh: 5.0px;
+  }
+}
