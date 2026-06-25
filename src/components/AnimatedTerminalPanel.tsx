@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v5";
+const SESSION_KEY   = "terminal_intro_v6";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -39,7 +39,7 @@ const L = (text: string, rest: Partial<TermLine> = {}): TermLine =>
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 const wait   = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
-const jitter = ()            => Math.floor(Math.random() * 75 + 38);
+const jitter = ()            => Math.floor(Math.random() * 20 + 10);
 
 /**
  * Trim leading blank Braille (⠀ U+2800) so the face fills the right panel.
@@ -66,8 +66,9 @@ function processPortrait(raw: string): string[] {
     return i;
   };
 
-  /* Only dense rows (≥10 non-blank chars) determine the left-trim amount */
-  const denseLines = lines.filter(l => nonBlankCount(l) >= 10);
+  /* Only use top 70% of rows to determine lead blanks (to ignore bottom scatter noise) */
+  const faceLines = lines.slice(0, Math.floor(lines.length * 0.7));
+  const denseLines = faceLines.filter(l => nonBlankCount(l) >= 10);
   if (!denseLines.length) return [];
 
   const minLead = Math.min(...denseLines.map(getLeadBlanks));
@@ -135,7 +136,7 @@ function Prompt() {
 function BarLine({ lbl, fill }: { lbl: string; fill: number }) {
   const f = Math.round(fill * BAR_W);
   return (
-    <div className="leading-snug font-mono text-[10px]">
+    <div className="leading-snug font-mono text-[9px]">
       <span className="text-muted">{lbl.padEnd(11)}</span>
       <span className="text-accent">{FILLED.repeat(f)}</span>
       <span className="text-iron">{EMPTY.repeat(BAR_W - f)}</span>
@@ -146,7 +147,7 @@ function BarLine({ lbl, fill }: { lbl: string; fill: number }) {
 function ProgBar({ pct }: { pct: number }) {
   const f = Math.round((pct / 100) * BAR_W);
   return (
-    <div className="font-mono text-[10px]">
+    <div className="font-mono text-[9px]">
       <span className="text-muted">[</span>
       <span className="text-accent">{FILLED.repeat(f)}</span>
       <span className="text-iron">{EMPTY.repeat(BAR_W - f)}</span>
@@ -306,7 +307,7 @@ export default function AnimatedTerminalPanel() {
     setPhase("IDLE");
 
     const run = async () => {
-      await wait(700);
+      await wait(300);
       if (!alive()) return;
 
       /* ── BOOT ──────────────────────────────────── */
@@ -317,7 +318,7 @@ export default function AnimatedTerminalPanel() {
 
       /* ── INIT ──────────────────────────────────── */
       setPhase("INIT");
-      await wait(180);
+      await wait(100);
 
       for (const l of [
         L("Initializing Developer Profile…", { cls: "text-muted" }),
@@ -330,12 +331,12 @@ export default function AnimatedTerminalPanel() {
         L("✓ Certifications",       { cls: "text-ok" }),
       ]) {
         if (!alive()) return;
-        await wait(155);
+        await wait(80);
         push(l);
       }
 
       /* ── VERIFY ────────────────────────────────── */
-      await wait(300);
+      await wait(150);
       if (!alive()) return;
       await typeCmd("verify_identity", alive);
       if (!alive()) return;
@@ -348,12 +349,12 @@ export default function AnimatedTerminalPanel() {
         L("Matching visual signature…", { cls: "text-muted" }),
       ]) {
         if (!alive()) return;
-        await wait(210);
+        await wait(100);
         push(l);
       }
 
       /* progress bar */
-      await wait(150);
+      await wait(80);
       if (!alive()) return;
       setShowProg(true);
 
@@ -361,9 +362,9 @@ export default function AnimatedTerminalPanel() {
         let p = 0;
         const tick = () => {
           if (!alive()) { res(); return; }
-          p = Math.min(100, p + Math.floor(Math.random() * 5) + 2);
+          p = Math.min(100, p + Math.floor(Math.random() * 8) + 4);
           setPct(p);
-          if (p < 100) setTimeout(tick, 22);
+          if (p < 100) setTimeout(tick, 16);
           else         res();
         };
         tick();
@@ -371,13 +372,13 @@ export default function AnimatedTerminalPanel() {
 
       if (!alive()) return;
       setShowProg(false);
-      await wait(180);
+      await wait(100);
 
       /* ── PORTRAIT (right panel reveal) ─────────── */
       setPhase("PORTRAIT");
       push(L("Rendering Developer Portrait…", { cls: "text-muted" }));
       setShowRight(true);   /* right panel appears */
-      await wait(200);
+      await wait(100);
       if (!alive()) return;
 
       const rows = portraitRef.current;
@@ -385,13 +386,13 @@ export default function AnimatedTerminalPanel() {
         if (!alive()) return;
         /* Add portrait rows to RIGHT panel, not left */
         setRightRows(p => [...p, rows[i]]);
-        await wait(14);
+        await wait(8);
       }
 
       if (!alive()) return;
-      await wait(250);
+      await wait(150);
       setShowIdent(true);   /* identity card appears */
-      await wait(500);
+      await wait(250);
 
       /* ── CAPABILITIES (left panel) ─────────────── */
       setPhase("CAPS");
@@ -406,7 +407,7 @@ export default function AnimatedTerminalPanel() {
         L("Status Open To Work",             { cls: "text-ok"   }),
       ]) {
         if (!alive()) return;
-        await wait(175);
+        await wait(90);
         push(l);
       }
 
@@ -418,18 +419,18 @@ export default function AnimatedTerminalPanel() {
         { barLbl: "Python",     barFill: 0.70 },
       ]) {
         if (!alive()) return;
-        await wait(145);
+        await wait(80);
         push(L(s.barLbl, { bar: true, ...s }));
       }
 
-      await wait(450);
+      await wait(250);
       if (!alive()) return;
 
       /* ── READY ─────────────────────────────────── */
       await typeCmd("ready", alive);
       if (!alive()) return;
       commit("ready");
-      await wait(150);
+      await wait(80);
       push(L("System Ready. Welcome to my portfolio.", { cls: "text-accent" }));
       setPhase("READY");
       setDone(true);
@@ -502,7 +503,7 @@ export default function AnimatedTerminalPanel() {
           >
             {/* Portrait — revealed row by row from top */}
             <div
-              className="flex-1 overflow-hidden"
+              className="flex-1 overflow-hidden pl-2 pt-1"
               style={{ lineHeight: 0 }}
             >
               {rightRows.map((row, i) => (
@@ -510,8 +511,8 @@ export default function AnimatedTerminalPanel() {
                   key={i}
                   className="whitespace-pre text-accent select-none"
                   style={{
-                    fontSize:      "7px",
-                    lineHeight:    "8.5px",
+                    fontSize:      "5.8px",
+                    lineHeight:    "6px",
                     fontFamily:    '"JetBrains Mono", "Courier New", monospace',
                     letterSpacing: "-0.2px",
                   }}
