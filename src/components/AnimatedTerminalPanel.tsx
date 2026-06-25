@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v7";
+const SESSION_KEY   = "terminal_intro_v8";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -92,7 +92,12 @@ function processPortrait(raw: string): string[] {
   while (rs < re && nonBlankCount(result[rs]) < 5) rs++;
   while (re > rs && nonBlankCount(result[re - 1]) < 5) re--;
 
-  return result.slice(rs, re);
+  const finalRows = result.slice(rs, re);
+  if (!finalRows.length) return [];
+
+  // Pad all rows to the exact same length (using blank braille) so they can be centered without distortion
+  const maxLen = Math.max(...finalRows.map(r => r.length));
+  return finalRows.map(r => r + B.repeat(maxLen - r.length));
 }
 
 /* ─── Left-panel snapshot (repeat visits) ────────────────── */
@@ -133,13 +138,32 @@ function Prompt() {
   );
 }
 
-function BarLine({ lbl, fill }: { lbl: string; fill: number }) {
-  const f = Math.round(fill * BAR_W);
+function BarLine({ lbl, fill, animate = false }: { lbl: string; fill: number; animate?: boolean }) {
+  const targetF = Math.round(fill * BAR_W);
+  const [currentF, setCurrentF] = useState(animate ? 0 : targetF);
+
+  useEffect(() => {
+    if (!animate) {
+      setCurrentF(targetF);
+      return;
+    }
+    let current = 0;
+    const interval = setInterval(() => {
+      if (current < targetF) {
+        current++;
+        setCurrentF(current);
+      } else {
+        clearInterval(interval);
+      }
+    }, 45);
+    return () => clearInterval(interval);
+  }, [targetF, animate]);
+
   return (
     <div className="leading-snug font-mono text-[9px]">
       <span className="text-muted">{lbl.padEnd(11)}</span>
-      <span className="text-accent">{FILLED.repeat(f)}</span>
-      <span className="text-iron">{EMPTY.repeat(BAR_W - f)}</span>
+      <span className="text-accent">{FILLED.repeat(currentF)}</span>
+      <span className="text-iron">{EMPTY.repeat(BAR_W - currentF)}</span>
     </div>
   );
 }
@@ -157,8 +181,8 @@ function ProgBar({ pct }: { pct: number }) {
   );
 }
 
-function LineEl({ line }: { line: TermLine }) {
-  if (line.bar) return <BarLine lbl={line.barLbl ?? ""} fill={line.barFill ?? 0} />;
+function LineEl({ line, animate }: { line: TermLine; animate: boolean }) {
+  if (line.bar) return <BarLine lbl={line.barLbl ?? ""} fill={line.barFill ?? 0} animate={animate} />;
   return (
     <div className={`leading-snug whitespace-pre-wrap break-words ${line.cls ?? "text-fg"}`}>
       {line.text}
@@ -362,9 +386,9 @@ export default function AnimatedTerminalPanel() {
         let p = 0;
         const tick = () => {
           if (!alive()) { res(); return; }
-          p = Math.min(100, p + Math.floor(Math.random() * 8) + 4);
+          p = Math.min(100, p + 1);
           setPct(p);
-          if (p < 100) setTimeout(tick, 16);
+          if (p < 100) setTimeout(tick, 12);
           else         res();
         };
         tick();
@@ -386,7 +410,7 @@ export default function AnimatedTerminalPanel() {
         if (!alive()) return;
         /* Add portrait rows to RIGHT panel, not left */
         setRightRows(p => [...p, rows[i]]);
-        await wait(8);
+        await wait(18);
       }
 
       if (!alive()) return;
@@ -480,7 +504,7 @@ export default function AnimatedTerminalPanel() {
             <div><Prompt /><BlinkCursor /></div>
           )}
 
-          {lines.map(l => <LineEl key={l.id} line={l} />)}
+          {lines.map(l => <LineEl key={l.id} line={l} animate={!done} />)}
 
           {showProg && (
             <div className="py-px"><ProgBar pct={pct} /></div>
@@ -502,7 +526,7 @@ export default function AnimatedTerminalPanel() {
           >
             {/* Portrait — revealed row by row from top */}
             <div
-              className="flex-1 overflow-hidden pt-1"
+              className="flex-1 overflow-hidden flex flex-col items-center pt-1"
               style={{ lineHeight: 0 }}
             >
               {rightRows.map((row, i) => (
