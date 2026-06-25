@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v4";
+const SESSION_KEY   = "terminal_intro_v5";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -41,25 +41,38 @@ const L = (text: string, rest: Partial<TermLine> = {}): TermLine =>
 const wait   = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 const jitter = ()            => Math.floor(Math.random() * 75 + 38);
 
-/* Trim common leading blank Braille from all rows so portrait
-   fits the right panel without being clipped on either side. */
+/**
+ * Trim leading blank Braille (⠀ U+2800) so the face fills the right panel.
+ *
+ * THE KEY BUG in v4: using ALL rows to find minLead.
+ * Rows 44-50 are sparse scatter-dots (clothes/background) that start at
+ * column 1-5, pulling minLead down to 1.  Only 1 char gets trimmed, so
+ * the face—which starts at column ~27—still has 26 blank chars of padding
+ * in front of it (≈ 109px), pushing it off the right edge of the panel.
+ *
+ * FIX: compute minLead from DENSE rows only (≥ 10 non-blank chars).
+ * Then additionally trim sparse rows (< 5 non-blank) from start & end.
+ */
 function processPortrait(raw: string): string[] {
   const B = BLANK_BRAILLE;
   const lines = raw.split("\n");
 
-  const contentLines = lines.filter(l =>
-    [...l].some(c => c !== B && c.trim() !== "")
-  );
-  if (!contentLines.length) return [];
+  const nonBlankCount = (l: string) =>
+    [...l].filter(c => c !== B && c.trim() !== "").length;
 
-  const minLead = Math.min(
-    ...contentLines.map(l => {
-      let i = 0;
-      while (i < l.length && l[i] === B) i++;
-      return i;
-    })
-  );
+  const getLeadBlanks = (l: string) => {
+    let i = 0;
+    while (i < l.length && l[i] === B) i++;
+    return i;
+  };
 
+  /* Only dense rows (≥10 non-blank chars) determine the left-trim amount */
+  const denseLines = lines.filter(l => nonBlankCount(l) >= 10);
+  if (!denseLines.length) return [];
+
+  const minLead = Math.min(...denseLines.map(getLeadBlanks));
+
+  /* Trim all rows by minLead and right-strip trailing blanks */
   const trimmed = lines.map(l => {
     const s = l.slice(minLead);
     let e = s.length;
@@ -67,10 +80,18 @@ function processPortrait(raw: string): string[] {
     return s.slice(0, e);
   });
 
+  /* Remove leading/trailing blank rows */
   let s = 0, e = trimmed.length;
   while (s < e && trimmed[s] === "") s++;
   while (e > s && trimmed[e - 1] === "") e--;
-  return trimmed.slice(s, e);
+
+  /* Additionally remove very sparse rows from start & end (background scatter) */
+  const result = trimmed.slice(s, e);
+  let rs = 0, re = result.length;
+  while (rs < re && nonBlankCount(result[rs]) < 5) rs++;
+  while (re > rs && nonBlankCount(result[re - 1]) < 5) re--;
+
+  return result.slice(rs, re);
 }
 
 /* ─── Left-panel snapshot (repeat visits) ────────────────── */
@@ -451,7 +472,7 @@ export default function AnimatedTerminalPanel() {
         {/* LEFT: scrollable command output */}
         <div
           ref={leftEl}
-          className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-3 py-3 space-y-[2px] text-[10px]"
+          className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-3 py-3 space-y-[2px] text-[9px]"
           style={{ scrollbarWidth: "none" }}
         >
           {phase === "IDLE" && (
@@ -477,7 +498,7 @@ export default function AnimatedTerminalPanel() {
         {showRight && (
           <div
             className="flex-shrink-0 border-l border-iron flex flex-col overflow-hidden"
-            style={{ width: "185px" }}
+            style={{ width: "195px" }}
           >
             {/* Portrait — revealed row by row from top */}
             <div
@@ -490,9 +511,9 @@ export default function AnimatedTerminalPanel() {
                   className="whitespace-pre text-accent select-none"
                   style={{
                     fontSize:      "7px",
-                    lineHeight:    "8px",
+                    lineHeight:    "8.5px",
                     fontFamily:    '"JetBrains Mono", "Courier New", monospace',
-                    letterSpacing: "-0.1px",
+                    letterSpacing: "-0.2px",
                   }}
                 >
                   {row}
