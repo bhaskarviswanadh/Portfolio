@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v8";
+const SESSION_KEY   = "terminal_intro_v9";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -198,10 +198,7 @@ function IdentityCard() {
         ✓ Identity Confirmed
       </div>
       <div className="text-bright font-bold font-mono leading-tight" style={{ fontSize: "10px" }}>
-        Bhaskar Viswanadh
-      </div>
-      <div className="text-muted font-mono" style={{ fontSize: "9px" }}>
-        Devisetti
+        Bhaskar Viswanadh Devisetti
       </div>
       <div className="text-accent font-mono" style={{ fontSize: "9px" }}>
         Cloud • DevOps • Networking
