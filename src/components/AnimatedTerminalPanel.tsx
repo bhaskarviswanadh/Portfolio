@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v9";
+const SESSION_KEY   = "terminal_intro_v10";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -114,9 +114,6 @@ const SNAP: TermLine[] = [
   L("bhaskar@portfolio:~$ verify_identity"),
   L("Scanning…  Matching…  Confirmed.", { cls: "text-muted" }),
   L("bhaskar@portfolio:~$ list_capabilities"),
-  L("OS     Ubuntu 24.04 LTS",        { cls: "text-muted" }),
-  L("Role   Cloud & DevOps Engineer", { cls: "text-muted" }),
-  L("Status Open To Work",            { cls: "text-ok"   }),
   L("Linux",      { bar: true, barFill: 0.93, barLbl: "Linux" }),
   L("Docker",     { bar: true, barFill: 0.80, barLbl: "Docker" }),
   L("AWS",        { bar: true, barFill: 0.78, barLbl: "AWS" }),
@@ -421,16 +418,7 @@ export default function AnimatedTerminalPanel() {
       await typeCmd("list_capabilities", alive);
       if (!alive()) return;
       commit("list_capabilities");
-
-      for (const l of [
-        L("OS     Ubuntu 24.04 LTS",        { cls: "text-muted" }),
-        L("Role   Cloud & DevOps Engineer",  { cls: "text-muted" }),
-        L("Status Open To Work",             { cls: "text-ok"   }),
-      ]) {
-        if (!alive()) return;
-        await wait(90);
-        push(l);
-      }
+      await wait(150);
 
       for (const s of [
         { barLbl: "Linux",      barFill: 0.93 },
