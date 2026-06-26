@@ -18,7 +18,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 const SESSION_KEY   = "terminal_intro_v15";
 const BAR_W         = 14;
 const FILLED        = "█";
-const EMPTY         = "░";
 const BLANK_BRAILLE = "\u2800";
 
 /* ─── Types ───────────────────────────────────────────────── */
