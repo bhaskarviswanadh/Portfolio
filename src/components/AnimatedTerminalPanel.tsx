@@ -157,11 +157,18 @@ function BarLine({ lbl, fill, animate = false }: { lbl: string; fill: number; an
     return () => clearInterval(interval);
   }, [targetF, animate]);
 
+  const displayPct = Math.round((currentF / targetF) * (fill * 100)) || 0;
+
   return (
-    <div className="leading-snug font-mono text-[9px]">
-      <span className="text-muted">{lbl.padEnd(11)}</span>
-      <span className="text-accent">{FILLED.repeat(currentF)}</span>
-      <span className="text-iron">{EMPTY.repeat(BAR_W - currentF)}</span>
+    <div className="leading-snug font-mono text-[9px] flex items-center justify-between w-full max-w-[210px]">
+      <div className="flex items-center">
+        <span className="text-muted inline-block w-[64px] flex-shrink-0">{lbl}</span>
+        <span className="text-muted select-none">[</span>
+        <span className="text-accent">{FILLED.repeat(currentF)}</span>
+        <span className="text-muted/35">{EMPTY.repeat(BAR_W - currentF)}</span>
+        <span className="text-muted select-none">]</span>
+      </div>
+      <span className="text-accent w-[28px] text-right">{displayPct}%</span>
     </div>
   );
 }
@@ -169,12 +176,15 @@ function BarLine({ lbl, fill, animate = false }: { lbl: string; fill: number; an
 function ProgBar({ pct }: { pct: number }) {
   const f = Math.round((pct / 100) * BAR_W);
   return (
-    <div className="font-mono text-[9px]">
-      <span className="text-muted">[</span>
-      <span className="text-accent">{FILLED.repeat(f)}</span>
-      <span className="text-iron">{EMPTY.repeat(BAR_W - f)}</span>
-      <span className="text-muted">] </span>
-      <span className="text-accent">{pct}%</span>
+    <div className="font-mono text-[9px] flex items-center justify-between w-full max-w-[210px]">
+      <div className="flex items-center">
+        <span className="text-muted inline-block w-[64px] flex-shrink-0">Boot</span>
+        <span className="text-muted select-none">[</span>
+        <span className="text-accent">{FILLED.repeat(f)}</span>
+        <span className="text-muted/35">{EMPTY.repeat(BAR_W - f)}</span>
+        <span className="text-muted select-none">]</span>
+      </div>
+      <span className="text-accent w-[28px] text-right">{pct}%</span>
     </div>
   );
 }
