@@ -65,9 +65,8 @@ function processPortrait(raw: string): string[] {
     return i;
   };
 
-  /* Only use top 70% of rows to determine lead blanks (to ignore bottom scatter noise) */
-  const faceLines = lines.slice(0, Math.floor(lines.length * 0.7));
-  const denseLines = faceLines.filter(l => nonBlankCount(l) >= 10);
+  /* Use all rows to determine lead blanks so shoulders are not trimmed */
+  const denseLines = lines.filter(l => nonBlankCount(l) >= 10);
   if (!denseLines.length) return [];
 
   const minLead = Math.min(...denseLines.map(getLeadBlanks));
