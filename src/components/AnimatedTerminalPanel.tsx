@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v12";
+const SESSION_KEY   = "terminal_intro_v15";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -202,7 +202,7 @@ function IdentityCard() {
         Cloud • DevOps • Networking
       </div>
       <div className="pt-1 font-mono" style={{ fontSize: "9px" }}>
-        <span className="text-muted">Status: </span>
+        <span className="text-bright font-bold">Status: </span>
         <span className="text-ok">Open To Work</span>
       </div>
     </div>
