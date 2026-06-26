@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v10";
+const SESSION_KEY   = "terminal_intro_v11";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -129,7 +129,7 @@ function BlinkCursor() { return <span className="cursor-blink" />; }
 function Prompt() {
   return (
     <>
-      <span className="text-accent select-none">bhaskar@portfolio</span>
+      <span className="text-fg select-none">bhaskar@portfolio</span>
       <span className="text-muted select-none">:~$ </span>
     </>
   );
