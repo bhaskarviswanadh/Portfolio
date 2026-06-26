@@ -165,7 +165,7 @@ function BarLine({ lbl, fill, animate = false }: { lbl: string; fill: number; an
         <span className="text-muted inline-block w-[64px] flex-shrink-0">{lbl}</span>
         <span className="text-muted select-none">[</span>
         <span className="text-accent">{FILLED.repeat(currentF)}</span>
-        <span className="text-muted/35">{EMPTY.repeat(BAR_W - currentF)}</span>
+        <span className="text-muted/30">{FILLED.repeat(BAR_W - currentF)}</span>
         <span className="text-muted select-none">]</span>
       </div>
       <span className="text-accent w-[28px] text-right">{displayPct}%</span>
@@ -181,7 +181,7 @@ function ProgBar({ pct }: { pct: number }) {
         <span className="text-muted inline-block w-[64px] flex-shrink-0">Boot</span>
         <span className="text-muted select-none">[</span>
         <span className="text-accent">{FILLED.repeat(f)}</span>
-        <span className="text-muted/35">{EMPTY.repeat(BAR_W - f)}</span>
+        <span className="text-muted/30">{FILLED.repeat(BAR_W - f)}</span>
         <span className="text-muted select-none">]</span>
       </div>
       <span className="text-accent w-[28px] text-right">{pct}%</span>
