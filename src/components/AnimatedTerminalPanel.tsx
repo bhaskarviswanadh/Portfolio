@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ─── Config ──────────────────────────────────────────────── */
-const SESSION_KEY   = "terminal_intro_v11";
+const SESSION_KEY   = "terminal_intro_v12";
 const BAR_W         = 14;
 const FILLED        = "█";
 const EMPTY         = "░";
@@ -120,7 +120,8 @@ const SNAP: TermLine[] = [
   L("Networking", { bar: true, barFill: 0.88, barLbl: "Networking" }),
   L("Python",     { bar: true, barFill: 0.70, barLbl: "Python" }),
   L("bhaskar@portfolio:~$ ready"),
-  L("System Ready. Welcome to my portfolio.", { cls: "text-accent" }),
+  L("System Ready.", { cls: "text-accent" }),
+  L("Welcome to my portfolio.", { cls: "text-accent" }),
 ];
 
 /* ─── Sub-components ──────────────────────────────────────── */
@@ -440,7 +441,9 @@ export default function AnimatedTerminalPanel() {
       if (!alive()) return;
       commit("ready");
       await wait(80);
-      push(L("System Ready. Welcome to my portfolio.", { cls: "text-accent" }));
+      push(L("System Ready.", { cls: "text-accent" }));
+      await wait(150);
+      push(L("Welcome to my portfolio.", { cls: "text-accent" }));
       setPhase("READY");
       setDone(true);
       sessionStorage.setItem(SESSION_KEY, "true");
