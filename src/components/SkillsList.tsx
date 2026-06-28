@@ -25,35 +25,43 @@ export default function SkillsList() {
     >
       <div className="grid gap-5 md:grid-cols-2">
         {skills.map((group, gi) => (
+          /*
+           * FIX: NO whileHover on the card — Framer Motion propagates
+           * whileHover from parent to all motion children, triggering every
+           * badge at once. Use plain CSS transition classes instead.
+           */
           <motion.div
             key={group.label}
             variants={itemVariants}
-            whileHover={{
-              borderColor: "rgba(45,212,191,0.3)",
-              boxShadow: "0 0 24px 0px rgba(45,212,191,0.08)",
-            }}
-            transition={{ duration: 0.25 }}
-            className="relative overflow-hidden rounded-lg border border-iron bg-obsidian/60 p-5"
+            className="group relative overflow-hidden rounded-lg border border-iron bg-obsidian/60 p-5
+                       transition-all duration-300
+                       hover:border-accent/30 hover:shadow-[0_0_24px_0px_rgba(45,212,191,0.08)]"
           >
-            {/* label */}
-            <div className="reveal-wrap">
-              <motion.div
-                className="font-mono text-sm text-accent"
-                initial={{ y: "100%" }}
-                whileInView={{ y: "0%" }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.55, ease: EXPO, delay: gi * 0.07 }}
-              >
-                {group.label}:
-              </motion.div>
-            </div>
+            {/* label — simple fade+slide, no clip-path wrapper */}
+            <motion.div
+              className="font-mono text-sm text-accent"
+              variants={{
+                hidden: { opacity: 0, y: 6 },
+                show:   { opacity: 1, y: 0, transition: { duration: 0.45, ease: EXPO, delay: gi * 0.06 } },
+              }}
+            >
+              {group.label}:
+            </motion.div>
 
-            {/* badges stagger in with spring pop */}
+            {/* badges — stagger in with spring pop */}
             <motion.div
               className="mt-3 flex flex-wrap gap-2"
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.045, delayChildren: 0.08 + gi * 0.07 } } }}
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.045, delayChildren: 0.08 + gi * 0.06 } },
+              }}
             >
               {group.items.map((item) => (
+                /*
+                 * FIX: whileHover ONLY on each individual badge — because the
+                 * parent no longer has whileHover, Framer Motion won't cascade
+                 * hover state down to children.
+                 */
                 <motion.span
                   key={item}
                   variants={badgeVariants}
@@ -63,7 +71,7 @@ export default function SkillsList() {
                     borderColor: "var(--color-accent)",
                     color: "var(--color-accent)",
                     backgroundColor: "rgba(45,212,191,0.08)",
-                    boxShadow: "0 0 10px rgba(45,212,191,0.25)",
+                    boxShadow: "0 0 10px rgba(45,212,191,0.22)",
                   }}
                   transition={{ duration: 0.15 }}
                   className="rounded border border-iron bg-graphite px-2.5 py-1 font-mono text-xs text-fg"
@@ -73,7 +81,7 @@ export default function SkillsList() {
               ))}
             </motion.div>
 
-            {/* corner accent dot */}
+            {/* corner accent dot — CSS group-hover opacity, not motion */}
             <motion.div
               className="absolute top-3 right-3 h-1.5 w-1.5 rounded-full bg-accent/40"
               initial={{ scale: 0 }}
