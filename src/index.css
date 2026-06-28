@@ -232,3 +232,95 @@ body::before {
     --portrait-lh: 5.0px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM ANIMATION UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Clip-path text reveal wrapper — overflow hidden so child slides up */
+.reveal-wrap {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+/* Gradient shimmer sweep (teal → white → teal) */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-accent)     0%,
+    #ffffff                40%,
+    var(--color-accent)    70%,
+    var(--color-accent-dim) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Animated draw-in underline for links */
+.underline-draw {
+  position: relative;
+  text-decoration: none;
+}
+.underline-draw::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background: var(--color-accent);
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.underline-draw:hover::after {
+  width: 100%;
+}
+
+/* Soft glow pulse for active/highlighted elements */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0  0px 0px rgba(45, 212, 191, 0.00); }
+  50%       { box-shadow: 0 0 20px 5px rgba(45, 212, 191, 0.20); }
+}
+.glow-idle {
+  animation: glow-pulse 3.5s ease-in-out infinite;
+}
+
+/* Button shine sweep */
+@keyframes btn-shine {
+  0%   { left: -120%; }
+  100% { left:  160%; }
+}
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  transform: skewX(-20deg);
+}
+.btn-shine:hover::after {
+  animation: btn-shine 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Number ticker flip */
+@keyframes tick-up {
+  from { transform: translateY(0.8em); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.tick-up {
+  animation: tick-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
