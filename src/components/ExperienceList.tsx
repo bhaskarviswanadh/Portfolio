@@ -1,4 +1,6 @@
+import { motion } from "motion/react";
 import Section from "@/components/Section";
+import { itemVariants } from "@/components/Section";
 import { experience } from "@/data";
 
 export default function ExperienceList() {
@@ -11,8 +13,9 @@ export default function ExperienceList() {
     >
       <div className="space-y-4">
         {experience.map((job) => (
-          <div
+          <motion.div
             key={job.id}
+            variants={itemVariants}
             className="group rounded-lg border border-iron bg-obsidian/60 p-5 transition-colors hover:border-accent/40"
           >
             <div className="grid gap-2 md:grid-cols-12 md:gap-4">
@@ -44,15 +47,17 @@ export default function ExperienceList() {
 
             <div className="mt-4 flex flex-wrap gap-2">
               {job.tech.map((t) => (
-                <span
+                <motion.span
                   key={t}
+                  whileHover={{ scale: 1.07, color: "var(--color-accent)" }}
+                  transition={{ duration: 0.15 }}
                   className="rounded border border-iron bg-graphite px-2 py-0.5 font-mono text-xs text-muted"
                 >
                   {t}
-                </span>
+                </motion.span>
               ))}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </Section>

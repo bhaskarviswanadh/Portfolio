@@ -10,18 +10,30 @@ type Props = {
   className?: string;
 };
 
+/** Shared variants so child components can opt-in to the stagger cascade */
+export const itemVariants = {
+  hidden: { opacity: 0, y: 18 },
+  show:   { opacity: 1, y: 0,  transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+export const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
+
 export default function Section({ id, name, command, comment, children, className }: Props) {
   return (
     <motion.section
       id={id}
       aria-label={name}
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial="hidden"
+      whileInView="show"
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      variants={containerVariants}
       className={`relative z-10 mx-auto w-full max-w-5xl px-6 ${className || "scroll-mt-24 py-16 md:py-24"}`}
     >
-      <div className="mb-10">
+      {/* Section heading animates in first */}
+      <motion.div className="mb-10" variants={itemVariants}>
         <h2 className="font-mono text-base text-accent md:text-lg">
           <span className="sr-only">{name}</span>
           <span aria-hidden="true">
@@ -33,7 +45,7 @@ export default function Section({ id, name, command, comment, children, classNam
             {comment}
           </p>
         )}
-      </div>
+      </motion.div>
       {children}
     </motion.section>
   );

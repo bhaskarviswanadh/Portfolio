@@ -1,4 +1,6 @@
+import { motion } from "motion/react";
 import Section from "@/components/Section";
+import { itemVariants } from "@/components/Section";
 import { projects } from "@/data";
 
 export default function ProjectGrid() {
@@ -11,9 +13,12 @@ export default function ProjectGrid() {
     >
       <div className="grid gap-5 md:grid-cols-2">
         {projects.map((p) => (
-          <div
+          <motion.div
             key={p.name}
-            className="flex flex-col rounded-lg border border-iron bg-obsidian/60 p-5 transition-colors hover:border-accent/40"
+            variants={itemVariants}
+            whileHover={{ y: -4, borderColor: "color-mix(in srgb, var(--color-accent) 40%, transparent)" }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-col rounded-lg border border-iron bg-obsidian/60 p-5 transition-colors"
           >
             <div className="flex items-baseline justify-between gap-2 font-mono text-sm">
               <div className="flex items-baseline gap-2">
@@ -21,15 +26,17 @@ export default function ProjectGrid() {
                 <span className="font-semibold text-bright">{p.name}</span>
               </div>
               {p.link && (
-                <a
+                <motion.a
                   href={p.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-muted transition-colors hover:text-accent"
+                  whileHover={{ x: 2, color: "var(--color-accent)" }}
+                  transition={{ duration: 0.15 }}
+                  className="text-xs text-muted"
                   aria-label={`View ${p.name} on GitHub`}
                 >
                   github ↗
-                </a>
+                </motion.a>
               )}
             </div>
             <div className="mt-1 font-mono text-xs text-muted">
@@ -48,7 +55,7 @@ export default function ProjectGrid() {
                 </span>
               ))}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </Section>
